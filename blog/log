@@ -1,0 +1,49 @@
+15:04:38.864 FATAL Something's wrong. Maybe you can find the solution here: http://hexo.io/docs/troubleshooting.html
+Template render error: (unknown path) [Line 14, Column 45]
+  expected variable end
+    at Object.exports.prettifyError (/blog/node_modules/nunjucks/src/lib.js:34:15)
+    at Obj.extend.render (/blog/node_modules/nunjucks/src/environment.js:468:27)
+    at Obj.extend.renderString (/blog/node_modules/nunjucks/src/environment.js:326:21)
+    at /blog/node_modules/hexo/lib/extend/tag.js:66:9
+    at Promise._execute (/blog/node_modules/bluebird/js/release/debuggability.js:284:9)
+    at Promise._resolveFromExecutor (/blog/node_modules/bluebird/js/release/promise.js:480:18)
+    at new Promise (/blog/node_modules/bluebird/js/release/promise.js:77:14)
+    at Tag.render (/blog/node_modules/hexo/lib/extend/tag.js:64:10)
+    at Object.tagFilter [as onRenderEnd] (/blog/node_modules/hexo/lib/hexo/post.js:253:16)
+    at /blog/node_modules/hexo/lib/hexo/render.js:65:19
+    at tryCatcher (/blog/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/blog/node_modules/bluebird/js/release/promise.js:509:31)
+    at Promise._settlePromise (/blog/node_modules/bluebird/js/release/promise.js:566:18)
+    at Promise._settlePromise0 (/blog/node_modules/bluebird/js/release/promise.js:611:10)
+    at Promise._settlePromises (/blog/node_modules/bluebird/js/release/promise.js:690:18)
+    at Async._drainQueue (/blog/node_modules/bluebird/js/release/async.js:138:16)
+    at Async._drainQueues (/blog/node_modules/bluebird/js/release/async.js:148:10)
+    at Immediate.Async.drainQueues (/blog/node_modules/bluebird/js/release/async.js:17:14)
+    at runCallback (timers.js:574:20)
+    at tryOnImmediate (timers.js:554:5)
+    at processImmediate [as _immediateCallback] (timers.js:533:5)
+15:04:38.893 FATAL (unknown path) [Line 14, Column 45]
+  expected variable end
+Template render error: (unknown path) [Line 14, Column 45]
+  expected variable end
+    at Object.exports.prettifyError (/blog/node_modules/nunjucks/src/lib.js:34:15)
+    at Obj.extend.render (/blog/node_modules/nunjucks/src/environment.js:468:27)
+    at Obj.extend.renderString (/blog/node_modules/nunjucks/src/environment.js:326:21)
+    at /blog/node_modules/hexo/lib/extend/tag.js:66:9
+    at Promise._execute (/blog/node_modules/bluebird/js/release/debuggability.js:284:9)
+    at Promise._resolveFromExecutor (/blog/node_modules/bluebird/js/release/promise.js:480:18)
+    at new Promise (/blog/node_modules/bluebird/js/release/promise.js:77:14)
+    at Tag.render (/blog/node_modules/hexo/lib/extend/tag.js:64:10)
+    at Object.tagFilter [as onRenderEnd] (/blog/node_modules/hexo/lib/hexo/post.js:253:16)
+    at /blog/node_modules/hexo/lib/hexo/render.js:65:19
+    at tryCatcher (/blog/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/blog/node_modules/bluebird/js/release/promise.js:509:31)
+    at Promise._settlePromise (/blog/node_modules/bluebird/js/release/promise.js:566:18)
+    at Promise._settlePromise0 (/blog/node_modules/bluebird/js/release/promise.js:611:10)
+    at Promise._settlePromises (/blog/node_modules/bluebird/js/release/promise.js:690:18)
+    at Async._drainQueue (/blog/node_modules/bluebird/js/release/async.js:138:16)
+    at Async._drainQueues (/blog/node_modules/bluebird/js/release/async.js:148:10)
+    at Immediate.Async.drainQueues (/blog/node_modules/bluebird/js/release/async.js:17:14)
+    at runCallback (timers.js:574:20)
+    at tryOnImmediate (timers.js:554:5)
+    at processImmediate [as _immediateCallback] (timers.js:533:5)
