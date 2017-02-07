@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "generate": "hexo generate"
+    "generate": "hexo generate",
+    "preview": "hexo server -p 5000"
   },
 
   "hexo": {
