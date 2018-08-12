@@ -67,11 +67,8 @@ onTouchEnd:function() {
   }
 },
 ```
-You can check the jsfiddle snippet below to see a working example.**Check it on your phone as no touchend event is emitted on the desktop browser.**
 
 In order to keep it concise, only the most pertinent code was demonstrated in this article. 
 For more details, check this [repo][repo].
-
-{% jsfiddle nq3qero4 result,js  %}
 
 [repo]:https://github.com/lo-tp/DragInBrowsers
