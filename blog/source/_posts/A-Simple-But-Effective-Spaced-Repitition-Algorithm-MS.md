@@ -8,7 +8,7 @@ tags:
 ---
 ![Sample Image Added via Markdown](/images/2018/08/learnFast.jpg)
 
-Personally I have been using spaced repetition algorithm in my study for many years. There are many different kinds of this algorithm and the one I have used is invented by BlueRaja called [SM2+][br] and I like it a lot. However, SM2+ has its own problem.
+Personally I have been using spaced repetition algorithm in my study for many years. There are many different kinds of this algorithm and the one I have used is invented by BlueRaja called [SM2+][br]. Based on this algorithm I have written a lib called [sm2-plus][sm2p] and I liked it a lot. However, SM2+ has its own problem.
 
 In this post I will show you what problems SM2+ algorithm has and provide a new algorithm named Memory Scheduler that I find quite helpful in my learning.
 
@@ -78,3 +78,4 @@ That's all I want to say about Memory Scheduler algorithm. As you can see, it's 
 [repo]:https://github.com/lo-tp/memory-scheduler
 [br]:http://www.blueraja.com/blog/477/a-better-spaced-repetition-learning-algorithm-sm2
 [ms]:https://www.npmjs.com/package/memory-scheduler
+[sm2p]:https://github.com/lo-tp/sm2-plus
