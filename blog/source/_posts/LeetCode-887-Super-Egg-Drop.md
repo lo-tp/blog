@@ -6,6 +6,8 @@ tags:
 - DP
 ---
 
+![Super Egg Drop](/images/2020/superEggDrop/cover.png)
+
 ['Super Egg Drop'](https://leetcode.com/problems/super-egg-drop/) is a very classic **DP** problem. Good articles explaining the O(KN\*N) and the O(KN*logN) solutions can be easily found from the internet. Better than that, there is a solution of O(KN). However, there isn't much about the O(KN) solution and the rare posts about it aren't very clear. The article you are reading now is an endeavor to fill this gap.
 
 # Check Out The Problem
