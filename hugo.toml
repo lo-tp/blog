@@ -1,0 +1,25 @@
+title = "Lotp's Blog"
+baseURL = "http://blog.lotp.xyz"
+languageCode = "en"
+description = "Every Day in Life Is a First Time"
+
+[params]
+description = "Every Day in Life Is a First Time"
+author = "lotp"
+avatar = "portrait.svg"
+
+enableRobotsTXT = true
+enableEmoji = true
+
+[permalinks]
+posts = "/:slug/"
+
+[outputs]
+home = ["html", "rss"]
+
+[markup]
+[markup.highlight]
+style = "monokai"
+lineNos = true
+lineNumbersSpan = true
+guessSyntax = true

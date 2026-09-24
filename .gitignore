@@ -1,9 +1,3 @@
-.DS_Store
-Thumbs.db
-db.json
-*.swp
-*.log
-node_modules/
 public/
-.deploy*/
-generate
+resources/
+.DS_Store
