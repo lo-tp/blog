@@ -1,4 +1,4 @@
-baseURL = "http://blog.lotp.xyz"
+baseURL = "https://blog.lotp.xyz/"
 title = "Lotp's Blog"
 languageCode = "en"
 DefaultContentLanguage = "en"
