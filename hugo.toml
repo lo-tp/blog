@@ -1,25 +1,22 @@
-title = "Lotp's Blog"
 baseURL = "http://blog.lotp.xyz"
+title = "Lotp's Blog"
 languageCode = "en"
-description = "Every Day in Life Is a First Time"
+DefaultContentLanguage = "en"
+enableInlineShortcodes = true
+
+theme = "hugo-paper"
 
 [params]
-description = "Every Day in Life Is a First Time"
-author = "lotp"
-avatar = "portrait.svg"
+  author = "lotp"
+  name = "Lotp"
+  bio = "Every Day in Life Is a First Time"
+  avatar = "portrait.svg"
+  github = "lo-tp"
 
-enableRobotsTXT = true
-enableEmoji = true
-
-[permalinks]
-posts = "/:slug/"
-
-[outputs]
-home = ["html", "rss"]
+[pagination]
+  pagerSize = 10
 
 [markup]
-[markup.highlight]
-style = "monokai"
-lineNos = true
-lineNumbersSpan = true
-guessSyntax = true
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
