@@ -1,3 +1,6 @@
 public/
-resources/
+resources/_gen/
+.hugo_build.lock
+.bin/
 .DS_Store
+*.swp
