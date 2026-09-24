@@ -12,6 +12,8 @@ theme = "hugo-paper"
   bio = "Every Day in Life Is a First Time"
   avatar = "portrait.svg"
   github = "lo-tp"
+  twitter = "lo__tp"
+  linkedin = "shiqi-yang-6bbb73127"
 
 [pagination]
   pagerSize = 10
