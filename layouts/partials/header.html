@@ -10,6 +10,8 @@
     3. because of 2, the header <script> moved to the end of <header> — it does
        document.querySelector('.btn-dark'), which would find nothing where the toggle used
        to sit. Do not move it back above the nav.
+  Spacing in that row is not set here: assets/custom.css replaces hugo-paper's unequal
+  space-x-10 / lg:ml-14 offsets with one even gap.
   On desktop these land at the end of the nav row; on mobile they are in the menu overlay,
   so the dark-mode toggle now takes two taps on a phone.
 */ -}}
@@ -72,9 +74,9 @@
     </nav>
     {{- end -}}<!---->
 
-    {{- partial "lang-switch.html" (dict "page" . "navClass" "mt-12 lg:mt-0 flex justify-center space-x-10 lg:items-center ltr:lg:ml-10 rtl:lg:mr-10" "linkClass" "block text-center text-xl leading-[5rem] lg:text-base lg:font-normal") -}}
+    {{- partial "lang-switch.html" (dict "page" . "navClass" "mt-12 lg:mt-0 flex justify-center lg:items-center" "linkClass" "block text-center text-xl leading-[5rem] lg:text-base lg:font-normal") -}}
 
-    <div class="mt-12 lg:mt-0 flex justify-center lg:items-center ltr:lg:ml-10 rtl:lg:mr-10">
+    <div class="mt-12 lg:mt-0 flex justify-center lg:items-center">
       <div
         class="btn-dark text-[0px] h-6 w-6 shrink-0 cursor-pointer {{ if site.Params.monoDarkIcon }}[background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert{{ else }}[background:url(./theme.png)_left_center/_auto_theme('spacing.6')_no-repeat] [transition:_background-position_0.4s_steps(5)]{{ end }} dark:[background-position:right]"
         role="button"

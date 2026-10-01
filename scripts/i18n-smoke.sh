@@ -95,6 +95,12 @@ else
   pass "an untranslated post shows no language switch (no untranslated post to check)"
 fi
 
+if grep -rq -- '--nav-gap' "$out"/main.min.*.css 2>/dev/null; then
+  pass "the header spacing rule ships in the built css (assets/custom.css is in the pipeline)"
+else
+  fail "the header spacing rule ships in the built css (assets/custom.css is in the pipeline)"
+fi
+
 if grep -q 'deprecated: project config key' "$build_log"; then
   fail "hugo.toml uses no deprecated keys"
   grep 'deprecated:' "$build_log" | sed 's/^/      /'

@@ -1,0 +1,80 @@
+/* Project CSS for this blog. Hugo concatenates this after the theme's compiled Tailwind
+   (layouts/partials/head.html: resources.Get "main.css" + resources.Get "custom.css"), so
+   it replaces hugo-paper's own placeholder assets/custom.css. Plain CSS only; if you ever
+   want Tailwind's @apply here, add `@reference` to the theme's assets/app.css first. */
+
+/* Header nav spacing: one even gap between the social icons, the language switch and the
+   dark-mode toggle. hugo-paper spaces that row with `space-x-10` (2.5rem) between items
+   plus per-group `lg:ml-14` / `lg:ml-10` offsets, so the gaps are unequal and wide. The
+   margins are cancelled and replaced by a single gap — this is the only place to change it.
+   !important is required: Tailwind v4 compiles its utilities as
+   `:where(.space-x-10 > …):not(#\#):not(#\#)…`, which lands at specificity (0,4,0). */
+:root {
+  --nav-gap: 0.75rem;
+}
+
+.nav-wrapper > nav,
+.nav-wrapper > nav > *,
+.nav-wrapper > div,
+.nav-wrapper > div > * {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.nav-wrapper > nav,
+.nav-wrapper > div {
+  gap: var(--nav-gap);
+}
+
+/* Between the groups only on desktop; on mobile they stack and keep their vertical rhythm. */
+@media (min-width: 64rem) {
+  .nav-wrapper {
+    gap: var(--nav-gap);
+  }
+}
+
+/* Home page: the gap between the top bar and the profile (avatar + name + bio).
+   hugo-paper writes it twice — `pt-14` on <main> in themes/hugo-paper/layouts/_default/
+   baseof.html, then `-mt-2 mb-12` on the avatar block in layouts/_default/list.html.
+   Both utilities ARE compiled — `.pt-14` lands at specificity (0,5,0) — so a bare element
+   selector only wins with !important. Measured with scripts/measure-home-gap.sh (CSS loading
+   asserted — see the warning in that script about baseURL and cross-origin CSS):
+     untouched theme ................. 48px  header → profile
+     --home-gap: 2rem, no lift ....... 32px
+     --home-gap: 0, --profile-lift: 1rem  16px
+   A profile is an identity block: it reads better tucked up under the site title than
+   separated from it, which is what --profile-lift buys. The lift is capped by the title's
+   own text box (header 72px tall, title text ends at y≈51): at 1rem the avatar top is
+   y=56 and clear; 1.5rem and above overlap the title on desktop and the avatar covers it.
+   1rem is therefore the largest usable lift — do not raise it without re-measuring
+   --profile-lift against `header > div > a`.
+   The profile block's own bottom margin is restored from hugo-paper's `mb-12` value (3rem),
+   NOT re-chosen here: that keeps the profile → first-post rhythm the theme already has, so
+   this file changes only the top gap. If you ever want the list tighter, that is a separate
+   decision from the header gap — change --post-gap deliberately, not as a side effect.
+   Article pages keep --article-gap (1.75rem, bar → title): they have no profile to tuck
+   under the bar, so a zero gap there reads as a clipping error, not as tight layout. */
+:root {
+  --home-gap: 0px;
+  --profile-lift: 1rem;
+  --post-gap: 3rem; /* = hugo-paper's mb-12 on the avatar block; unchanged on purpose */
+  --article-gap: 1.75rem;
+}
+
+/* Articles and tag pages. */
+main {
+  padding-top: var(--article-gap) !important;
+}
+
+/* The home page IS the list template with the profile block as its first element —
+   hugo-paper ships no home.html — so :has() tells the home page apart from a post without
+   adding a template or a class. */
+main:has(> div:first-of-type img[alt]) {
+  padding-top: var(--home-gap) !important;
+}
+
+/* Only the top of the profile block is retuned; margin-bottom reproduces the theme. */
+main > div:first-of-type {
+  margin-top: calc(var(--profile-lift) * -1) !important;
+  margin-bottom: var(--post-gap) !important;
+}

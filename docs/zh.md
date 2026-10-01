@@ -142,6 +142,22 @@ document order. That script sits at the bottom of `<header>` for that reason. Mo
 above the nav and the dark-mode button stops working, with nothing in the build log to tell
 you.
 
+## Header spacing
+
+The social icons, the language switch and the dark-mode toggle are spaced by one value in
+`assets/custom.css`:
+
+```css
+:root { --nav-gap: 0.75rem; }
+```
+
+That file replaces hugo-paper's placeholder `assets/custom.css` (Hugo's project assets win),
+and it cancels the theme's `space-x-10` between icons plus the `lg:ml-14` / `lg:ml-10`
+group offsets — which is why the theme's class list still mentions them while the rendered
+gaps are equal. The overrides need `!important` because Tailwind v4 compiles those utilities
+at specificity (0,4,0). Change `--nav-gap` and nothing else. The smoke check fails if the
+rule stops shipping, which is what deleting the file would do.
+
 ## Known warnings
 
 `hugo` reports one deprecation this site does not control:
