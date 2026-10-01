@@ -1,7 +1,9 @@
 baseURL = "https://blog.lotp.xyz/"
 title = "Lotp's Blog"
-languageCode = "en"
 DefaultContentLanguage = "en"
+# English stays at / ; Chinese is served under /zh/ . No Accept-Language redirects:
+# the language switch is explicit. See docs/adr/0001-hugo-i18n-with-zh-language-key.md
+defaultContentLanguageInSubdir = false
 enableInlineShortcodes = true
 
 theme = "hugo-paper"
@@ -14,6 +16,25 @@ theme = "hugo-paper"
   github = "lo-tp"
   twitter = "lo__tp"
   linkedin = "shiqi-yang-6bbb73127"
+
+# `zh` means Simplified Chinese. The key must be exactly `zh`: hugo-paper ships
+# i18n/zh.yaml and Hugo does not fall back to it from `zh-cn`. A Traditional
+# edition would later be a separate `zh-hant` language with its own i18n files.
+[languages.en]
+locale = "en"
+label = "English"
+weight = 1
+
+[languages.zh]
+locale = "zh"
+label = "中文"
+weight = 2
+# 中文文案由你填写 —— uncomment to override the English values for /zh/ :
+# title = "Lotp's Blog"
+
+# [languages.zh.params]
+# description = "..."
+# bio = "..."
 
 [pagination]
   pagerSize = 10

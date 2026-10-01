@@ -19,6 +19,9 @@ jobs:
       - name: Build
         run: ./hugo
 
+      - name: i18n smoke check
+        run: HUGO_BIN=./hugo bash scripts/i18n-smoke.sh
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh

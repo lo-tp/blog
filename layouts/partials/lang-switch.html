@@ -1,0 +1,27 @@
+{{- /*
+  lang-switch.html — link a page to its own translation, in both directions.
+
+  Usage:
+    partial "lang-switch.html" (dict "page" . "navClass" "…" "linkClass" "…")
+
+  Renders nothing when the page has no counterpart, so an untranslated post shows no
+  switch. Post pairing comes from `translationKey` in the frontmatter; home, section
+  and tag pages pair by their shared path and need no key.
+*/ -}}
+{{- $nav_class := .navClass | default "mt-14 flex" -}}
+{{- $link_class := .linkClass | default "btn not-prose" -}}
+{{- $targets := slice -}}
+{{- range .page.Translations -}}
+  {{- if ne .Language.Lang site.Language.Lang -}}
+    {{- $targets = $targets | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- if $targets -}}
+<nav class="{{- $nav_class -}}" data-lang-switch>
+  {{- range $targets -}}
+  <a class="{{- $link_class -}}" hreflang="{{- .Language.Locale -}}" href="{{- .Permalink -}}"
+    >{{- or .Language.Label .Language.EndName .Language.Lang -}}</a
+  >
+  {{- end -}}
+</nav>
+{{- end -}}
