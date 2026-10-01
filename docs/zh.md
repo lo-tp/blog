@@ -6,7 +6,8 @@ at `/` and is the source of record. Why it is built this way:
 (original, translation pair, drift, orphan) is in [CONTEXT.md](../CONTEXT.md).
 
 Scope of the tooling: it makes a Chinese edition possible and keeps it honest. **Every
-translation is written by the author.** Nothing here translates article text.
+translation is written by the author.** Nothing here translates article text. The scripts in
+detail: [scripts.md](./scripts.md).
 
 ## Add a Chinese version of a post
 
@@ -79,7 +80,9 @@ proposed terminology for article text is in [CONTEXT.md](../CONTEXT.md).
 scripts/i18n-status.sh
 ```
 
-Informational, always exits 0. Reports originals with no Chinese counterpart, orphan
+Informational, always exits 0. Full usage and how drift is measured:
+[scripts.md → i18n-status.sh](./scripts.md#scriptsi18n-statussh--see-what-is-left-to-do).
+Reports originals with no Chinese counterpart, orphan
 translations, translations missing a `translationKey`, and **drift** — a translation whose
 English original was committed later than the translation itself. Drift is expected; the
 point is that it is visible rather than assumed away.
@@ -103,7 +106,8 @@ the deploy instead of surfacing as a 404 for a reader.
 
 It depends on a draft fixture pair, `content/posts/i18n-smoke-test.md` and
 `.i18n-smoke-test.zh.md`. Drafts are never published. If you delete the fixture, delete the
-`i18n smoke check` step in `.github/workflows/deploy.yml` too.
+`i18n smoke check` step in `.github/workflows/deploy.yml` too. Full check list and a
+trouble table: [scripts.md → i18n-smoke.sh](./scripts.md#scriptsi18n-smokesh--prove-the-wiring-still-works).
 
 ## Vendored layout files (the maintenance cost of this design)
 
