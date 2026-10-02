@@ -29,6 +29,12 @@
 - id: chrome_years
   translation: '年份'
 
+- id: chrome_edition
+  translation: '版本'
+
+- id: chrome_edition_night
+  translation: '夜间'
+
 - id: chrome_theme_toggle
   translation: '在日间与夜间版本之间切换'
 

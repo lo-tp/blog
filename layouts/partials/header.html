@@ -104,16 +104,20 @@
         setDark(event.matches);
       });
 
-      // the toggle itself
-      const btnDark = document.querySelector(".btn-dark");
-      btnDark.addEventListener("click", () => {
-        setDark(localStorage.getItem("dark") !== "true");
-      });
-      btnDark.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
+      // the toggle itself — every page carries one dial: the running head's, and on
+      // the title page the masthead controls' too. Wire them all; the contract is one
+      // control per row, not one per page.
+      const btnDark = document.querySelectorAll(".btn-dark");
+      btnDark.forEach((node) => {
+        node.addEventListener("click", () => {
           setDark(localStorage.getItem("dark") !== "true");
-        }
+        });
+        node.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setDark(localStorage.getItem("dark") !== "true");
+          }
+        });
       });
     </script>
   </div>

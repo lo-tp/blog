@@ -20,8 +20,11 @@
     <a href="{{ "/" | absLangURL }}">{{ site.Params.name | default site.Title }}</a>
   </h1>
   <div class="imprint">
-    {{- /* Masthead profile glyphs: the same drawn icon set and accessible-name
-      idiom as the running head, printed where the bio line used to sit. */ -}}
+    {{- /* Masthead controls: the profile glyphs plus the reader's own two edition
+      controls — the language of this record and the day/night edition — each named
+      in the apparatus voice, in the edition's own head face. The same controls the
+      running head carries, printed at the title page. */ -}}
+    <nav class="frontmatter-controls" aria-label="{{- i18n "chrome_profile" -}} · {{- i18n "chrome_edition" -}}">
     {{- $services := slice -}}
     {{- if site.Params.github -}}{{- $services = $services | append (dict "id" "github" "label" "GitHub" "href" (print "https://github.com/" site.Params.github)) -}}{{- end -}}
     {{- if site.Params.twitter -}}{{- $services = $services | append (dict "id" "twitter" "label" "X" "href" (print "https://x.com/" site.Params.twitter)) -}}{{- end -}}
@@ -39,6 +42,27 @@
       {{- end -}}
     </nav>
     {{- end -}}
+
+    <span class="edition-control">
+      <span class="edition-control__label">{{- i18n "chrome_edition" -}}</span>
+      {{- partial "lang-switch.html" (dict "page" . "navClass" "lang-switch" "linkClass" "") -}}
+    </span>
+
+    <span class="edition-control">
+      <span class="edition-control__label">{{- i18n "chrome_edition_night" -}}</span>
+      <span
+        class="btn-dark"
+        role="button"
+        tabindex="0"
+        aria-label="{{- i18n "chrome_theme_toggle" -}}"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="dial" cx="12" cy="12" r="8.5" />
+          <path class="shade" d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
+        </svg>
+      </span>
+    </span>
+    </nav>
   </div>
 </header>
 

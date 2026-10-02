@@ -326,6 +326,40 @@ hr {
   gap: var(--nav-gap);
 }
 
+/* Title-page controls: the same row the running head carries — profile links →
+   language switch → dark-mode dial — printed under the masthead, each of the
+   reader's own two controls named in the apparatus voice. The labels use the
+   running head's label setting; the Chinese edition sets them in its own head
+   face, as every other apparatus label does. */
+.frontmatter-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.95rem;
+  flex-wrap: wrap;
+}
+
+.edition-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.edition-control__label {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+:lang(zh) .edition-control__label {
+  font-family: var(--f-cjk-head);
+  letter-spacing: 0.06em;
+}
+
 /* Social: drawn glyphs from the icon set the theme ships, in one weight. */
 .social {
   display: flex;

@@ -30,6 +30,12 @@
 - id: chrome_years
   translation: 'Years'
 
+- id: chrome_edition
+  translation: 'Edition'
+
+- id: chrome_edition_night
+  translation: 'Night'
+
 - id: chrome_theme_toggle
   translation: 'Switch between the day and night editions'
 
