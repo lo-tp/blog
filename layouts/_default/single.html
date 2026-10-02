@@ -20,7 +20,21 @@
 {{- end -}}
 {{- $twin := index $twins 0 -}}
 
-<article class="record">
+{{- /* The marginal contents index: the index rail of the title page turned to
+  face inward, printed beside a record that is long enough to have sections.
+  A record with fewer than two named sections gets no index — an apparatus that
+  lists one thing is decoration. Hugo's own TOC nav is kept as the landmark but
+  named in the reader's language, the way every other control on the site is. */ -}}
+{{- $toc := "" -}}
+{{- with .TableOfContents -}}
+{{- $raw := printf "%s" . -}}
+{{- if ge (len (findRE "<a href=\"#" $raw)) 2 -}}
+{{- $open := printf "<nav aria-label=\"%s\">" (i18n "chrome_contents") -}}
+{{- $toc = replaceRE "<nav id=\"TableOfContents\">" $open $raw -}}
+{{- end -}}
+{{- end -}}
+
+<article class="record{{ if $toc }} record--indexed{{ end }}">
   <header class="record__head">
     <h1 class="record__title">{{- .Title -}}</h1>
     <div class="meta">
@@ -39,6 +53,15 @@
       {{- end -}}
     </div>
   </header>
+
+  {{- /* The index sits beside the text on a wide sheet and above it on a
+  narrow one — never behind a menu, same as the title page's plan. */ -}}
+  {{- with $toc -}}
+  <div class="record__toc">
+    <h2 class="label record__toc__title">{{- i18n "chrome_contents" -}}</h2>
+    {{- . | safe.HTML -}}
+  </div>
+  {{- end -}}
 
   <section class="record__body">
     {{- .Content -}}
@@ -93,4 +116,54 @@
   </nav>
   {{- end -}}
 </article>
+
+{{- /* Which section the reader is on. The same apparatus the technique page
+  uses for the current technique: the entry carries aria-current and the solid
+  rule; every other entry stays present and legible. The reading line is the
+  bottom edge of the sticky band, so the marked entry is the one under the
+  band, not the one the jump landed past. */ -}}
+{{- with $toc -}}
+<script>
+  (function () {
+    const toc = document.querySelector(".record__toc");
+    if (!toc) return;
+    const entries = [];
+    toc.querySelectorAll('a[href^="#"]').forEach((link) => {
+      const ref = link.getAttribute("href").slice(1);
+      let id = ref;
+      try {
+        id = decodeURIComponent(ref);
+      } catch (e) {}
+      const target = document.getElementById(id);
+      if (target) entries.push({ link, target });
+    });
+    if (entries.length < 2) return;
+
+    let on = null;
+    let frame = null;
+    const mark = (entry) => {
+      if (entry === on) return;
+      if (on) on.link.removeAttribute("aria-current");
+      on = entry || null;
+      if (on) on.link.setAttribute("aria-current", "true");
+    };
+    const measure = () => {
+      frame = null;
+      const band = document.querySelector(".masthead-band .frontmatter");
+      const line = (band ? band.getBoundingClientRect().bottom : 0) + 24;
+      let active = null;
+      for (const entry of entries) {
+        if (entry.target.getBoundingClientRect().top <= line) active = entry;
+      }
+      mark(active);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    addEventListener("scroll", schedule, { passive: true });
+    addEventListener("resize", schedule);
+    measure();
+  })();
+</script>
+{{- end -}}
 {{- end -}}

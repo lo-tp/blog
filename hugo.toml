@@ -56,6 +56,22 @@ title = "Lotp 的工程记录"
     [markup.goldmark.renderer]
       unsafe = true
 
+  # The record page's marginal contents index (layouts/_default/single.html)
+  # prints section headings only: an h1 would repeat the record title the page
+  # already headlines, and a fourth level would be an entry the margin cannot
+  # indent honestly. ordered = false keeps the list unordered, which is what the
+  # index's CSS (.record__toc ul) styles.
+  #
+  # This key sits under [markup], not under [markup.goldmark]: a
+  # [markup.goldmark.tableOfContents] block builds clean and changes nothing.
+  # Hugo 0.166's own defaults happen to be startLevel 2 / endLevel 3, so the
+  # inert block looked as if it worked. Stated here, the levels the design asks
+  # for are the levels the site gets whatever a Hugo upgrade does to defaults.
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+    ordered = false
+
   # Code is the content of this site as much as prose is. With noClasses the
   # highlighter emits token classes instead of inline colours, so assets/custom.css
   # owns what code looks like in the day edition and in the night one — the

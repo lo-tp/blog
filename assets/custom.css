@@ -95,6 +95,11 @@
 
   --measure-sheet: 1220px;
   --measure-index: 264px;
+  /* The marginal contents index beside a record: the index rail's outward
+     mirror, on the other side of the reading measure. Narrower than the title
+     page's rail because its entries are the record's own headings, and 610 +
+     this + the spread's gap must still fit the sheet at 1000px. */
+  --measure-toc: 232px;
   /* Reading measure — ONE width for both editions. It was 57ch, and a `ch` is the
      width of "0" in whichever face the element happens to set: the English page
      resolved it against system-ui (610px) and the Chinese page against Songti SC,
@@ -1070,6 +1075,9 @@ a.masthead--part {
 .record__body h4 {
   margin: var(--head-room) 0 var(--head-room-after);
   line-height: 1.25;
+  /* A jumped-to heading lands below the sticky band, not under it: the same
+     offset the year anchors keep. */
+  scroll-margin-top: calc(var(--band-h) + 1rem);
 }
 
 .record__body h2 {
@@ -1353,6 +1361,94 @@ a.masthead--part {
 }
 
 /* ----------------------------------------------------------------------------
+   9b. The marginal contents index (a record's own index rail)
+
+   Only records with sections get one (the template counts them). The record
+   keeps its measure and its centring; the index is apparatus printed in the
+   sheet's outer margin beside it — the title page's index rail, mirrored to
+   the outward side. Entries are set in the text face, not the display face:
+   a heading is content. The entry for the section the reader is on takes the
+   "on" state the site already uses — solid rule, weight — while every other
+   entry stays present and legible. Blue only ever means the jump itself.
+   --------------------------------------------------------------------------- */
+
+.record--indexed {
+  max-width: none;
+  display: grid;
+  grid-template-columns: var(--measure-read) var(--measure-toc);
+  justify-content: center; /* the pair stays centred between the margins */
+  column-gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+/* The record's own movements stay in the first column, in their own rows, as
+   they would be with no index at all. The index spans the same rows — a
+   record prints at most head, body, edition switch, neighbours — so its
+   sticky range covers the whole record. */
+.record--indexed > :not(.record__toc) {
+  grid-column: 1;
+}
+
+.record__toc {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  position: sticky;
+  top: calc(var(--band-h) + 1rem);
+}
+
+.record__toc__title {
+  color: var(--ink);
+  margin: 0 0 var(--g-2);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+:lang(zh) .record__toc__title {
+  font-family: var(--f-cjk-head);
+  letter-spacing: 0.06em;
+}
+
+.record__toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.15rem;
+}
+
+/* A third-level heading is a part of the section above it: deeper ink would
+   make it look like a sibling. */
+.record__toc ul ul {
+  padding-left: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.record__toc a {
+  display: block;
+  padding: 0.15rem 0 0.15rem 0.65rem;
+  border-left: 2px solid transparent;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  transition: color var(--step) var(--ease), border-color var(--step) var(--ease);
+}
+
+.record__toc a:hover,
+.record__toc a:focus-visible {
+  color: var(--nav);
+  border-left-color: var(--nav);
+  text-decoration: underline;
+}
+
+.record__toc a[aria-current="true"] {
+  color: var(--ink);
+  font-weight: 600;
+  border-left-color: var(--ink);
+}
+
+/* ----------------------------------------------------------------------------
    10. Colophon
    --------------------------------------------------------------------------- */
 
@@ -1404,6 +1500,19 @@ a.masthead--part {
    --------------------------------------------------------------------------- */
 
 @media (max-width: 1000px) {
+  /* The index plan travels with the record: below the width where a marginal
+     column fits, the contents index prints compactly above the text instead —
+     the same contract the title page's index keeps. */
+  .record--indexed {
+    display: block;
+    max-width: var(--measure-read);
+  }
+
+  .record__toc {
+    position: static;
+    margin: 0 0 var(--block-gap);
+  }
+
   .spread {
     grid-template-columns: 1fr;
     gap: var(--g-4);
