@@ -1,0 +1,75 @@
+# Project chrome strings for the English edition.
+#
+# These name the parts of the page — running heads, index titles, page turns,
+# the date format in the ledger. Article text is never translated by tooling
+# (CONTEXT.md: Author translation); nothing here is article copy.
+# The theme's hugo-paper i18n stays installed and supplies prev_page / next_page,
+# which is why this file uses the same id/translation shape it does.
+
+- id: chrome_contents
+  translation: 'Contents'
+
+- id: chrome_record
+  translation: 'Record'
+
+- id: chrome_index
+  translation: 'Index'
+
+- id: chrome_profile
+  translation: 'Profile'
+
+- id: chrome_skip
+  translation: 'Skip to contents'
+
+- id: chrome_techniques
+  translation: 'Index of techniques'
+
+- id: chrome_all_techniques
+  translation: 'All techniques'
+
+- id: chrome_years
+  translation: 'Years'
+
+- id: chrome_theme_toggle
+  translation: 'Switch between the day and night editions'
+
+- id: chrome_engineering_notes
+  translation: 'Engineering notes'
+
+- id: chrome_imprint
+  translation: 'Every article written and translated by hand'
+
+- id: chrome_page_of
+  translation: 'Page'
+
+- id: chrome_date_format
+  translation: '2006-01-02'
+
+- id: chrome_here
+  translation: 'You are reading'
+
+- id: chrome_pair
+  translation: 'In its other language'
+
+- id: chrome_record_earlier
+  translation: 'Earlier record'
+
+- id: chrome_record_later
+  translation: 'Later record'
+
+- id: chrome_404
+  translation: 'There is no record at this address.'
+
+- id: chrome_colophon_built
+  translation: 'Built with Hugo'
+
+- id: chrome_colophon_icons
+  translation: 'icons from hugo-paper'
+
+- id: chrome_colophon_type
+  translation: 'Set in Archivo Narrow'
+
+- id: chrome_records_unit
+  translation:
+    one: ' record'
+    other: ' records'

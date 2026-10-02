@@ -1,83 +1,91 @@
+{{- /*
+  list.html — home, sections, technique pages, and the full technique index.
+
+  Home is the edition's title page: the masthead, the imprint line, then the
+  spread — the plan on the left (techniques with counts, the year spine, the
+  author), the contents ledger on the right.
+  A technique page is the same ledger with one technique marked, in the
+  author's own spelling of it, not Hugo's lowercased taxonomy key.
+  /tags/ is the index on its own, every technique counted.
+*/ -}}
 {{- define "main" -}}
+{{- $records := .Scratch.Get "records" -}}
+{{- $techs := .Scratch.Get "techniques" -}}
+{{- $singles := .Scratch.Get "singles" -}}
+{{- $index := $techs | append $singles -}}
 
-<!-- Tag Title -->
-{{- if and .Title (eq .Type "tags") -}}
-<h1 class="mb-14">#{{- .Title -}}</h1>
-{{- end -}}
-
-<!-- $pages -->
-{{- $pages := union .RegularPages .Sections -}}<!---->
-{{- if .IsHome -}}<!---->
-{{- $pages = where site.RegularPages "Type" "in" site.Params.mainSections -}}<!---->
-{{- end -}}
-
-<!-- Articles -->
-{{- $paginator := .Paginate $pages -}} {{- range $index, $page :=
-$paginator.Pages -}}<!---->
-
-<!-- avatar -->
-{{- if and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}<!---->
-
-{{- $avatar_url := $.Scratch.Get "avatar_url" -}}<!---->
-{{- if or $avatar_url site.Params.name -}}
-<div class="-mt-2 mb-12 flex items-center">
-  {{- if $avatar_url -}}
-  <div
-    class="h-24 w-24 shrink-0 rounded-full border-[0.5px] border-black/10 ltr:mr-5 ltr:-ml-1 rtl:-mr-1 rtl:ml-5"
-  >
-    <img
-      class="not-prose my-0 h-full w-full rounded-full bg-black/5! hover:animate-spin dark:bg-black/80!"
-      src="{{- $avatar_url -}}"
-      alt="{{- site.Params.name | default site.Title -}}"
-    />
+{{- if .IsHome -}}
+{{- $span := .Scratch.Get "span" -}}
+<header class="frontmatter">
+  <h1 class="masthead">
+    <a href="{{ "/" | absLangURL }}">{{ site.Params.name | default site.Title }}</a>
+  </h1>
+  <div class="imprint">
+    {{- if and $span.from $span.to -}}
+    <p>{{ i18n "chrome_engineering_notes" }} · {{ $span.from }} → {{ $span.to }}</p>
+    {{- else -}}
+    <p>{{ i18n "chrome_engineering_notes" }}</p>
+    {{- end -}}
+    <p>{{ i18n "chrome_imprint" }}</p>
+    {{- with site.Params.bio -}}
+    <p class="imprint__bio">{{ . }}</p>
+    {{- end -}}
   </div>
-  {{- end -}}<!---->
-  {{- if site.Params.name -}}
-  <div>
-    <div class="mt-3 mb-1 text-2xl font-medium text-black dark:text-white">
-      {{- site.Params.name -}}
-    </div>
-    <div class="break-words">
-      {{- site.Params.bio | default (print `A personal blog by `
-      site.Params.name) -}}
-    </div>
-  </div>
-  {{- end -}}
+</header>
+
+<div class="spread">
+  {{- partial "index-rail.html" (dict "page" .) -}}
+  {{- partial "ledger.html" (dict "page" . "pages" $records "paginate" true) -}}
 </div>
-{{- end -}}<!---->
 
-{{- end -}}
+{{- else if eq .Kind "taxonomy" -}}
+<header class="frontmatter frontmatter--part">
+  <h1 class="masthead masthead--part">{{ i18n "chrome_index" }}</h1>
+  <div class="imprint">
+    <p>{{ i18n "chrome_all_techniques" }} · {{ len $index }}</p>
+  </div>
+</header>
 
-<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
-  {{- if gt .Weight 0 -}}
-  <span class="mb-1 inline-block text-xs tracking-wider text-orange-500"
-    >Featured</span
-  >
-  {{- end -}}
-  <h2 class="my-0!">{{- .Title -}}</h2>
-  <time class="text-xs antialiased opacity-60"
-    >{{- .Date | time.Format ":date_medium" -}}</time
-  >
-  <a class="absolute inset-0 text-[0px]" href="{{- .Permalink -}}"
-    >{{- .Title -}}</a
-  >
+<section class="contents">
+  <h2 class="contents__title">{{ i18n "chrome_techniques" }}</h2>
+  <ul class="terms">
+    {{- range $entry := $index -}}
+    <li>
+      <a href="{{ $entry.href }}">{{ $entry.name }}</a>
+      {{- with $entry.count -}}
+      <span class="index__count">{{ . }}</span>
+      {{- end -}}
+    </li>
+    {{- end -}}
+  </ul>
 </section>
+
+{{- else -}}
+{{- /* A term or section page. Hugo's term title is the lowercased key, so the
+  heading and the index mark both come from the index data instead. */ -}}
+{{- $key := urlize .Title -}}
+{{- $currentKey := "" -}}
+{{- $label := .Title -}}
+{{- if eq .Kind "term" -}}
+{{- $currentKey = $key -}}
+{{- range $entry := $index -}}
+{{- if eq $entry.key $key -}}
+{{- $label = $entry.name -}}
 {{- end -}}
+{{- end -}}
+{{- end -}}
+{{- $pages := where .Pages "Draft" "eq" false -}}
 
-<!-- Main Nav -->
-{{- if gt $paginator.TotalPages 1 -}}
-<nav class="mt-14 flex">
-  {{- if $paginator.HasPrev -}}
-  <a class="btn not-prose" href="{{- $paginator.Prev.URL -}}"
-    >← {{- i18n "prev_page" -}}</a
-  >
-  {{- end -}}<!---->
-  {{- if $paginator.HasNext -}}
-  <a class="btn not-prose ml-auto" href="{{- $paginator.Next.URL -}}"
-    >{{- i18n "next_page" -}} →</a
-  >
-  {{- end -}}
-</nav>
-{{- end -}}<!---->
+<header class="frontmatter frontmatter--part">
+  <h1 class="masthead masthead--part">{{ $label }}</h1>
+  <div class="imprint">
+    <p>{{ i18n "chrome_index" }} · {{ len $pages }}{{ i18n "chrome_records_unit" (len $pages) }}</p>
+  </div>
+</header>
 
+<div class="spread">
+  {{- partial "index-rail.html" (dict "page" . "current" $currentKey) -}}
+  {{- partial "ledger.html" (dict "page" . "pages" $pages "paginate" false) -}}
+</div>
+{{- end -}}
 {{- end -}}

@@ -1,0 +1,65 @@
+{{- /*
+  ledger.html — the contents, grouped under year markers.
+
+  Usage: partial "ledger.html" (dict "pages" $pages "paginate" true)
+
+  The grouping is derived from the records themselves, so a year marker never
+  claims a number that is not on the page. Each year is an anchor target for
+  the year spine in the index rail.
+*/ -}}
+{{- $pages := .pages -}}
+{{- $paginator := "" -}}
+{{- if .paginate -}}
+{{- $paginator = .page.Paginate $pages -}}
+{{- $pages = $paginator.Pages -}}
+{{- end -}}
+
+{{- $years := slice -}}
+{{- $counts := dict -}}
+{{- range $p := $pages -}}
+{{- $y := $p.Date.Format "2006" -}}
+{{- $have := 0 -}}
+{{- $cur := index $counts $y -}}
+{{- if $cur -}}
+{{- $have = $cur -}}
+{{- else -}}
+{{- $years = $years | append $y -}}
+{{- end -}}
+{{- $counts = merge $counts (dict $y (add $have 1)) -}}
+{{- end -}}
+
+<section class="contents" id="contents">
+  <h2 class="contents__title">{{- i18n "chrome_contents" -}}</h2>
+
+  {{- range $y := $years -}}
+  <div class="year" id="y{{- $y -}}">
+    <h3 class="year__mark">
+      <span class="year__num">{{ $y }}</span>
+      <span class="year__count">{{ index $counts $y }}{{ i18n "chrome_records_unit" (index $counts $y) }}</span>
+    </h3>
+    <ul class="year__rows">
+      {{- range $p := $pages -}}
+      {{- if eq ($p.Date.Format "2006") $y -}}
+      {{- partial "record-row.html" (dict "page" $p) -}}
+      {{- end -}}
+      {{- end -}}
+    </ul>
+  </div>
+  {{- end -}}
+</section>
+
+{{- if and .paginate $paginator -}}
+{{- if gt $paginator.TotalPages 1 -}}
+<nav class="turn" aria-label="{{ i18n "chrome_contents" }}">
+  <span class="turn__where">{{ i18n "chrome_page_of" }} {{ $paginator.PageNumber }} / {{ $paginator.TotalPages }}</span>
+  <div class="turn__nav">
+    {{- if $paginator.HasPrev }}
+    <a href="{{ $paginator.Prev.URL }}">← {{ i18n "prev_page" }}</a>
+    {{- end }}
+    {{- if $paginator.HasNext }}
+    <a href="{{ $paginator.Next.URL }}">{{ i18n "next_page" }} →</a>
+    {{- end }}
+  </div>
+</nav>
+{{- end -}}
+{{- end -}}

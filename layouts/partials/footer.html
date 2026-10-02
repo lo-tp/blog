@@ -1,0 +1,21 @@
+{{- /*
+  footer.html — the colophon.
+
+  A printed edition states who made it. Every line here is true: Hugo built it,
+  the icon set is hugo-paper's (the theme is still installed for its i18n and
+  its static assets, though no template of its renders), and the display
+  lettering is Archivo Narrow, self-hosted from static/fonts/.
+*/ -}}
+<footer class="sheet">
+  <div class="colophon">
+    <span>© {{- now.Year -}} {{- site.Params.name | default site.Title -}}</span>
+    <span>{{- i18n "chrome_colophon_built" -}}</span>
+    <span>{{- i18n "chrome_colophon_icons" -}}</span>
+    <span>{{- i18n "chrome_colophon_type" -}}</span>
+    <span>
+      {{- with .Scratch.Get "span" -}}
+      {{ if .from }}{{ .from }} → {{ .to }}{{ end }}
+      {{- end -}}
+    </span>
+  </div>
+</footer>

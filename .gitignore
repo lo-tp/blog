@@ -4,3 +4,6 @@ resources/_gen/
 .bin/
 .DS_Store
 *.swp
+.build.tmp/
+.impeccable/review/
+.impeccable/measure/

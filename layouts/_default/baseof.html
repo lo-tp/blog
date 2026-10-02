@@ -1,0 +1,45 @@
+{{- /*
+  baseof.html — the shell of the edition.
+
+  Written here rather than inherited from hugo-paper. The theme's own baseof is
+  what loaded the compiled Tailwind bundle and what read `.Site.LanguageCode`,
+  the deprecation docs/zh.md had to describe as an accepted warning: with this
+  file in place that warning no longer appears in the build log.
+
+  hugo-paper stays installed on purpose: its i18n files (the Chinese chrome
+  strings, including prev_page / next_page) and its static assets (the social
+  icon set, favicon) are still used. No template from the theme renders.
+*/ -}}
+<!doctype html>
+{{- partial "records.html" . -}}
+<html class="not-ready" lang="{{- site.Language.Lang -}}">
+  <head>
+    {{- partial "head.html" . -}}
+  </head>
+  <body>
+    <script>
+      // Apply the reader's stored edition before anything paints, so a night
+      // reader never sees a flash of paper first.
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("dark");
+        } catch (e) {}
+        var prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (stored !== null ? stored === "true" : prefersDark) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+
+    {{- partial "header.html" . -}}
+
+    <main class="sheet page">
+      {{- block "main" . }}{{- end -}}
+    </main>
+
+    {{- partial "footer.html" . -}}
+  </body>
+</html>

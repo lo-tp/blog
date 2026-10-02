@@ -1,0 +1,97 @@
+{{- /*
+  index-rail.html — the plan of the edition, printed beside the contents.
+
+  Usage: partial "index-rail.html" (dict "page" . "current" $technique)
+
+  On a technique page the current technique is named with aria-current and set
+  in the reserved ink; every other technique stays visible and dimmed. Nothing
+  is hidden behind the current selection — the reader can always step sideways.
+
+  On phones this rail is not a menu that opens: it is a compact strip that
+  stays above the ledger while it scrolls.
+*/ -}}
+{{- $page := .page -}}
+{{- $currentKey := .current -}}
+{{- $techs := $page.Scratch.Get "techniques" -}}
+{{- $singles := $page.Scratch.Get "singles" -}}
+{{- $years := $page.Scratch.Get "years" -}}
+
+<nav class="index" {{- if $currentKey -}} data-isolated="true" {{- end -}} aria-label="{{- i18n "chrome_index" -}}">
+  <div class="index__block">
+    <h2 class="index__title index__title--full">{{ i18n "chrome_techniques" }}</h2>
+    <ul class="index__list">
+      {{- range $techs -}}
+      <li>
+        <a href="{{- .href -}}"{{- if eq .key $currentKey }} aria-current="true"{{- end -}}
+          >{{- .name -}}</a>
+        <span class="index__count">{{- .count -}}</span>
+      </li>
+      {{- end -}}
+    </ul>
+    {{- with $singles -}}
+    <ul class="index__singles">
+      {{- range . -}}
+      <li>
+        <a href="{{- .href -}}"{{- if eq .key $currentKey }} aria-current="true"{{- end -}}
+          >{{- .name -}}</a>
+      </li>
+      {{- end -}}
+    </ul>
+    {{- end -}}
+    <p class="index__more">
+      <a href="{{- "tags/" | absLangURL -}}">{{- i18n "chrome_all_techniques" -}}</a>
+    </p>
+  </div>
+
+  <div class="index__block">
+    <h2 class="index__title">{{- i18n "chrome_years" -}}</h2>
+    <ul class="years">
+      {{- range $years -}}
+      <li>
+        <a href="{{- print "#y" .year -}}"
+          >{{- .year -}}&nbsp;<span class="index__count">{{- .count -}}</span></a
+        >
+      </li>
+      {{- end -}}
+    </ul>
+  </div>
+
+  <div class="index__block index__block--author">
+    <div class="author">
+      {{- with site.Params.avatar -}}
+      <figure class="author__portrait">
+        <img src="{{- . -}}" alt="{{- site.Params.name | default site.Title -}}" width="64" height="64" />
+      </figure>
+      {{- end -}}
+      <div>
+        <p class="author__name">{{- site.Params.name | default site.Title -}}</p>
+        {{- with site.Params.bio -}}
+        <p class="author__bio">{{- . -}}</p>
+        {{- end -}}
+        <ul class="author__links">
+          {{- if site.Params.github -}}
+          <li>
+            <a href="https://github.com/{{- site.Params.github -}}" target="_blank" rel="me noopener">
+              <span>GitHub</span><span>{{- site.Params.github -}}</span>
+            </a>
+          </li>
+          {{- end -}}
+          {{- if site.Params.twitter -}}
+          <li>
+            <a href="https://x.com/{{- site.Params.twitter -}}" target="_blank" rel="me noopener">
+              <span>X</span><span>{{- site.Params.twitter -}}</span>
+            </a>
+          </li>
+          {{- end -}}
+          {{- if site.Params.linkedin -}}
+          <li>
+            <a href="https://www.linkedin.com/in/{{- site.Params.linkedin -}}" target="_blank" rel="me noopener">
+              <span>LinkedIn</span><span>{{- site.Params.linkedin -}}</span>
+            </a>
+          </li>
+          {{- end -}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>

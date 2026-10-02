@@ -1,0 +1,74 @@
+# 本站的界面文案（chrome）。
+#
+# 这些名字属于书的骨架：页眉、索引标题、翻页、目录里的日期格式。
+# 正文从不由工具翻译（见 CONTEXT.md 里的 Author translation）；这里没有正文。
+# 主题 hugo-paper 的 i18n 仍然安装，prev_page / next_page 由它提供，
+# 所以这个文件沿用它一样的 id/translation 写法。
+
+- id: chrome_contents
+  translation: '目录'
+
+- id: chrome_record
+  translation: '记录'
+
+- id: chrome_index
+  translation: '索引'
+
+- id: chrome_profile
+  translation: '作者'
+
+- id: chrome_skip
+  translation: '跳到目录'
+
+- id: chrome_techniques
+  translation: '技法索引'
+
+- id: chrome_all_techniques
+  translation: '全部技法'
+
+- id: chrome_years
+  translation: '年份'
+
+- id: chrome_theme_toggle
+  translation: '在日间与夜间版本之间切换'
+
+- id: chrome_engineering_notes
+  translation: '工程记录'
+
+- id: chrome_imprint
+  translation: '每一篇都由作者亲手撰写、亲手翻译'
+
+- id: chrome_page_of
+  translation: '第'
+
+- id: chrome_date_format
+  translation: '2006年1月2日'
+
+- id: chrome_here
+  translation: '正在阅读'
+
+- id: chrome_pair
+  translation: '另一语言版本'
+
+- id: chrome_record_earlier
+  translation: '更早的记录'
+
+- id: chrome_record_later
+  translation: '更新的记录'
+
+- id: chrome_404
+  translation: '这里没有这条记录。'
+
+- id: chrome_colophon_built
+  translation: '由 Hugo 构建'
+
+- id: chrome_colophon_icons
+  translation: '图标来自 hugo-paper'
+
+- id: chrome_colophon_type
+  translation: '字体 Archivo Narrow'
+
+- id: chrome_records_unit
+  translation:
+    one: ' 篇'
+    other: ' 篇'

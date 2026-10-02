@@ -1,0 +1,111 @@
+{{- /*
+  records.html — computes the edition's index data once per page and stores it
+  on the page Scratch, so the running head, the ledger, the technique index and
+  the colophon all read the same numbers instead of deriving them twice.
+
+  Keys it sets:
+    records      published records of the current language, newest first
+    span         the first and last year anything was published, site-wide
+    years        [ { year, count } ] for the current language, newest first
+    techniques   [ { name, key, href, count } ] — techniques with two or more records
+    singles      [ { name, key, href } ]      — techniques with exactly one record
+*/ -}}
+{{- $main := site.Params.mainSections | default (slice "posts") -}}
+
+{{- /* Current language. Drafts are never part of the edition: the i18n smoke
+  fixture pair is built with --buildDrafts and must stay out of the ledger. */ -}}
+{{- $records := where site.RegularPages "Type" "in" $main -}}
+{{- $records = where $records "Draft" "eq" false -}}
+{{- $.Scratch.Set "records" $records -}}
+
+{{- /* The span of years is site-wide: an English reader and a Chinese reader
+  must be told the same thing. Reaching the other language goes through the
+  posts section and its translations. */ -}}
+{{- $every := slice -}}
+{{- $section := site.GetPage "posts" -}}
+{{- if $section -}}
+{{- $langs := slice $section -}}
+{{- range $section.AllTranslations -}}
+{{- $langs = $langs | append . -}}
+{{- end -}}
+{{- range $l := $langs -}}
+{{- $every = $every | append $l.RegularPages -}}
+{{- end -}}
+{{- end -}}
+{{- if not $every -}}
+{{- $every = $records -}}
+{{- end -}}
+
+{{- $allYears := slice -}}
+{{- range $p := $every -}}
+{{- if not $p.Draft -}}
+{{- $allYears = $allYears | append ($p.Date.Format "2006") -}}
+{{- end -}}
+{{- end -}}
+{{- $span := dict "from" "" "to" "" -}}
+{{- if $allYears -}}
+{{- $allYears = sort $allYears -}}
+{{- $span = dict "from" (index $allYears 0) "to" (index $allYears (sub (len $allYears) 1)) -}}
+{{- end -}}
+{{- $.Scratch.Set "span" $span -}}
+
+{{- /* Year spine for the current language's ledger. */ -}}
+{{- $byYear := slice -}}
+{{- $yearCounts := dict -}}
+{{- range $p := $records -}}
+{{- $y := $p.Date.Format "2006" -}}
+{{- $have := 0 -}}
+{{- $cur := index $yearCounts $y -}}
+{{- if $cur -}}
+{{- $have = $cur -}}
+{{- else -}}
+{{- $byYear = $byYear | append $y -}}
+{{- end -}}
+{{- $yearCounts = merge $yearCounts (dict $y (add $have 1)) -}}
+{{- end -}}
+{{- $yearRows := slice -}}
+{{- range $y := $byYear -}}
+{{- $yearRows = $yearRows | append (dict "year" $y "count" (index $yearCounts $y)) -}}
+{{- end -}}
+{{- $.Scratch.Set "years" $yearRows -}}
+
+{{- /* Technique index.
+  This is built from the records' own tags, not from site.Taxonomies: Hugo's
+  taxonomy keys are lowercased, and this author's tags are proper names —
+  LeetCode, Reading Notes, Functional Programming. The index prints the
+  spelling on the page and links to the slug Hugo actually routes.
+
+  Techniques with two or more records become counted entries. One-record
+  techniques become a plain tail line, so the index is not twenty-six rows of
+  the number 1. */ -}}
+{{- $counts := dict -}}
+{{- $spellings := dict -}}
+{{- range $p := $records -}}
+{{- range $tag := $p.Params.tags -}}
+{{- $key := urlize $tag -}}
+{{- if not (index $spellings $key) -}}
+{{- $spellings = merge $spellings (dict $key $tag) -}}
+{{- end -}}
+{{- $n := 0 -}}
+{{- $cur := index $counts $key -}}
+{{- if $cur -}}
+{{- $n = $cur -}}
+{{- end -}}
+{{- $counts = merge $counts (dict $key (add $n 1)) -}}
+{{- end -}}
+{{- end -}}
+
+{{- $techs := slice -}}
+{{- $singles := slice -}}
+{{- range $key, $n := $counts -}}
+{{- $entry := dict "name" (index $spellings $key) "key" $key "href" (print (absLangURL "tags/") $key) -}}
+{{- if ge $n 2 -}}
+{{- $techs = $techs | append (merge $entry (dict "count" $n)) -}}
+{{- else -}}
+{{- $singles = $singles | append $entry -}}
+{{- end -}}
+{{- end -}}
+{{- $techs = sort $techs "count" "desc" -}}
+{{- $singles = sort $singles "name" "asc" -}}
+{{- $.Scratch.Set "techniques" $techs -}}
+{{- $.Scratch.Set "singles" $singles -}}

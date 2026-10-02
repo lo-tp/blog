@@ -1,143 +1,98 @@
 {{- /*
-  Vendored copy of themes/hugo-paper/layouts/_default/single.html (hugo-paper 6.31.0).
-  Do not put anything outside the define blocks below: Hugo drops the page when a
-  content template renders content outside a block.
-  Keep this file in sync by hand when the theme is updated:
-    diff themes/hugo-paper/layouts/_default/single.html layouts/_default/single.html
-  One deliberate change (docs/adr/0001-hugo-i18n-with-zh-language-key.md):
-    tag links use absLangURL, so a Chinese post points at /zh/tags/… and not at the
-    English tag pages.
+  single.html — a record.
+
+  This is the Read surface: one measure, no aside, no card. The apparatus sits
+  above the text (date in the reserved ink, language, techniques) and the two
+  closing movements below it: the facing pair, and the next record named by its
+  title rather than an anonymous arrow.
+
+  Keep every character inside the define block below: Hugo drops the whole page
+  if a content template renders anything outside a block. Tag links use
+  absLangURL so a Chinese record points at /zh/tags/… — the one change this file
+  carried over from the vendored theme copy (docs/adr/0001).
 */ -}}
-
 {{- define "main" -}}
+{{- $twins := slice -}}
+{{- range $t := .Translations -}}
+{{- if ne $t.Language.Lang site.Language.Lang -}}
+{{- $twins = $twins | append $t -}}
+{{- end -}}
+{{- end -}}
+{{- $twin := index $twins 0 -}}
 
-<article>
-  <header class="mb-14">
-    <h1 class="my-0! pb-2.5">{{- .Title -}}</h1>
-
-    {{- if ne .Type "page" -}}
-    <div class="text-xs antialiased opacity-60">
-      {{- if .Date -}}
-      <time>{{- .Date | time.Format ":date_medium" -}}</time>
-      {{- end -}}<!---->
-      {{- $single_author := or .Params.author site.Params.author -}}
-      <!---->
-      {{- if $single_author -}}
-      <span class="mx-1">&middot;</span>
-      <span>{{- $single_author -}}</span>
+<article class="record">
+  <header class="record__head">
+    <h1 class="record__title">{{- .Title -}}</h1>
+    <div class="meta">
+      <time datetime="{{- .Date.Format "2006-01-02" -}}">
+        {{- .Date | time.Format ":date_medium" -}}
+      </time>
+      <span>{{- or .Language.Label .Language.Lang -}}</span>
+      {{- with .Params.tags -}}
+      <ul class="meta__tags">
+        {{- range . -}}
+        <li>
+          <a href="{{- print (absLangURL "tags/") (urlize .) -}}">{{- . -}}</a>
+        </li>
+        {{- end -}}
+      </ul>
       {{- end -}}
     </div>
-    {{- end -}}
   </header>
 
-  <section>{{- .Content -}}</section>
+  <section class="record__body">
+    {{- .Content -}}
+  </section>
 
-  <!-- Post Tags -->
-  {{- if .Params.tags -}}
-  <footer class="mt-12 flex flex-wrap">
-    {{- range .Params.tags -}} {{- $href := print (absLangURL "tags/") (urlize .)
-    -}}
-    <a
-      class="mb-1.5 rounded-lg bg-black/[3%] px-5 py-1 no-underline hover:bg-black/[6%] ltr:mr-1.5 rtl:ml-1.5 dark:bg-white/[8%] dark:hover:bg-white/[12%]"
-      href="{{- $href -}}"
-      >{{- . -}}</a
-    >
-    {{- end -}}
-  </footer>
+  {{- with $twin -}}
+  <section class="pair">
+    <div class="pair__half pair__half--here">
+      <span class="label">{{- i18n "chrome_here" -}}</span>
+      <span class="pair__current" aria-current="true">
+        {{ or $.Language.Label $.Language.Lang }} — {{ $.Title }}
+      </span>
+    </div>
+    <span class="pair__gutter" aria-hidden="true"></span>
+    <div class="pair__half">
+      <span class="label">{{- i18n "chrome_pair" -}}</span>
+      <a
+        hreflang="{{- .Language.Locale -}}"
+        href="{{- .RelPermalink -}}"
+        >{{ or .Language.Label .Language.Lang }} — {{ .Title }}</a>
+    </div>
+  </section>
   {{- end -}}
 
-  <!-- Post Nav -->
-  {{- if not site.Params.disablePostNavigation -}}<!---->
-  {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections -}}<!---->
-  {{- if and (gt (len $pages) 1) (in $pages . ) -}}
-  <nav
-    class="mt-24 flex overflow-hidden rounded-xl bg-black/[3%] text-lg leading-[1.2]! *:flex *:w-1/2 *:items-center *:p-5 *:font-medium *:no-underline dark:bg-white/[8%] [&>*:hover]:bg-black/[2%] dark:[&>*:hover]:bg-white/[3%]"
-  >
-    {{- with $pages.Next . -}}
-    <a class="ltr:pr-3 rtl:pl-3" href="{{- .Permalink -}}"
-      ><span class="ltr:mr-1.5 rtl:ml-1.5">←</span><span>{{- .Name -}}</span></a
-    >
-    {{- end -}}<!---->
-    {{- with $pages.Prev . -}}
-    <a
-      class="justify-end pl-3 ltr:ml-auto rtl:mr-auto"
-      href="{{- .Permalink -}}"
-      ><span>{{- .Name -}}</span><span class="ltr:ml-1.5 rtl:mr-1.5">→</span></a
-    >
-    {{- end -}}
+  {{- /* Earlier and later, resolved from the edition's own record list. The
+  next thing to read is named by its title, never an anonymous arrow back to
+  the list. Scoped to the language being read: a record's neighbours are the
+  records of its own edition. */ -}}
+  {{- $recs := .Scratch.Get "records" -}}
+  {{- $idx := -1 -}}
+  {{- range $i, $p := $recs -}}
+  {{- if eq $p.RelPermalink .RelPermalink -}}{{- $idx = $i -}}{{- end -}}
+  {{- end -}}
+  {{- $earlier := "" -}}
+  {{- $later := "" -}}
+  {{- if ge $idx 0 -}}
+  {{- if lt $idx (sub (len $recs) 1) -}}{{- $earlier = index $recs (add $idx 1) -}}{{- end -}}
+  {{- if ge $idx 1 -}}{{- $later = index $recs (sub $idx 1) -}}{{- end -}}
+  {{- end -}}
+  {{- if or $earlier $later -}}
+  <nav class="adjacent" aria-label="{{ i18n "chrome_contents" }}">
+    {{- with $earlier }}
+    <a href="{{ .RelPermalink }}">
+      <span class="label">{{ i18n "chrome_record_earlier" }}</span>
+      <span>{{ .Title }}</span>
+    </a>
+    {{- end }}
+    {{- with $later }}
+    <a href="{{ .RelPermalink }}">
+      <span class="label">{{ i18n "chrome_record_later" }}</span>
+      <span>{{ .Title }}</span>
+    </a>
+    {{- end }}
   </nav>
-  {{- end -}}<!---->
-  {{- end -}}
-
-  <!-- Disqus -->
-  {{- if and site.Config.Services.Disqus.Shortname (not (eq .Params.comments
-  false)) -}}
-  <div class="mt-24! text-black dark:text-white" id="disqus_thread"></div>
-  <script>
-    const disqusShortname = '{{- site.Config.Services.Disqus.Shortname -}}';
-    const script = document.createElement('script');
-    script.src = 'https://' + disqusShortname + '.disqus.com/embed.js';
-    script.setAttribute('data-timestamp', +new Date());
-    document.head.appendChild(script);
-  </script>
-  {{- end -}}
-
-  <!-- GraphComment -->
-  {{- if and site.Params.graphCommentId (not (eq .Params.comments false)) -}}
-  <div class="mt-24! text-black dark:text-white" id="graphcomment"></div>
-  <script type="text/javascript">
-    var __semio__params = {
-      graphcommentId: '{{- site.Params.graphCommentId  -}}',
-      behaviour: {
-        //  uid: "...",
-      },
-      // configure your variables here
-    };
-
-    function __semio__onload() {
-      __semio__gc_graphlogin(__semio__params);
-    }
-
-    (function () {
-      var gc = document.createElement('script');
-      gc.type = 'text/javascript';
-      gc.async = true;
-      gc.onload = __semio__onload;
-      gc.defer = true;
-      gc.src =
-        'https://integration.graphcomment.com/gc_graphlogin.js?' + Date.now();
-      (
-        document.getElementsByTagName('head')[0] ||
-        document.getElementsByTagName('body')[0]
-      ).appendChild(gc);
-    })();
-  </script>
-  {{- end -}}
-
-  <!-- mermaid -->
-  {{- partial "mermaid.html" . -}}
-
-  <!-- giscus comment -->
-  {{- if and site.Params.giscus.repo (not (eq .Params.comments false)) -}}
-  <div class="giscus mt-24! text-black dark:text-white"></div>
-  <script
-    src="https://giscus.app/client.js"
-    data-repo="{{- site.Params.giscus.repo -}}"
-    data-repo-id="{{- site.Params.giscus.repoId -}}"
-    data-category="{{- site.Params.giscus.category -}}"
-    data-category-id="{{- site.Params.giscus.categoryId -}}"
-    data-mapping="{{- site.Params.giscus.mapping | default (print `pathname`) -}}"
-    data-strict="{{- site.Params.giscus.strict | default (print `1`) -}}"
-    data-reactions-enabled="{{- site.Params.giscus.reactionsEnabled | default (print `0`) -}}"
-    data-emit-metadata="{{- site.Params.giscus.emitMetadata | default (print `0`) -}}"
-    data-input-position="{{- site.Params.giscus.inputPosition | default (print `top`) -}}"
-    data-theme="{{- site.Params.giscus.theme | default (print `light`) -}}"
-    data-lang="{{- site.Params.giscus.lang | default (print `en`) -}}"
-    data-loading="{{- site.Params.giscus.loading | default (print `lazy`) -}}"
-    crossorigin="anonymous"
-    async
-  ></script>
   {{- end -}}
 </article>
-
 {{- end -}}

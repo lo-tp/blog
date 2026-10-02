@@ -16,6 +16,9 @@ theme = "hugo-paper"
   github = "lo-tp"
   twitter = "lo__tp"
   linkedin = "shiqi-yang-6bbb73127"
+  # The meta description of a non-article page. It states only what the site
+  # actually is; there are no readership numbers or claims to put here.
+  description = "First-hand engineering notes by lotp: problems solved, the code that ran, and the decisions kept. English and Simplified Chinese."
 
 # `zh` means Simplified Chinese. The key must be exactly `zh`: hugo-paper ships
 # i18n/zh.yaml and Hugo does not fall back to it from `zh-cn`. A Traditional
@@ -25,16 +28,19 @@ locale = "en"
 label = "English"
 weight = 1
 
+# The Chinese edition's own chrome, per PRODUCT.md: /zh/ stops inheriting the
+# English title, bio and description. The wording below is DRAFTED BY THE TOOL
+# for the author's approval — it is site chrome, not a translation of an article,
+# and PRODUCT.md says the author owns it. Replace any line you would not write.
 [languages.zh]
 locale = "zh"
 label = "中文"
 weight = 2
-# 中文文案由你填写 —— uncomment to override the English values for /zh/ :
-# title = "Lotp's Blog"
+title = "Lotp 的工程记录"
 
-# [languages.zh.params]
-# description = "..."
-# bio = "..."
+[languages.zh.params]
+  bio = "生活中的每一天，都是第一次。"
+  description = "一个人的工程记录：解决过的问题、跑过的代码、做下的决定。英文与简体中文双语。"
 
 [pagination]
   pagerSize = 10
@@ -43,3 +49,15 @@ weight = 2
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+
+  # Code is the content of this site as much as prose is. With noClasses the
+  # highlighter emits token classes instead of inline colours, so assets/custom.css
+  # owns what code looks like in the day edition and in the night one — the
+  # inline-style default could not follow a reader into either.
+  [markup.highlight]
+    codeFences = true
+    guessFences = false
+    noClasses = false
+    lineNos = false
+    tabWidth = 2
+    style = "monokai"

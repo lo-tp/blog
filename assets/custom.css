@@ -1,80 +1,1624 @@
-/* Project CSS for this blog. Hugo concatenates this after the theme's compiled Tailwind
-   (layouts/partials/head.html: resources.Get "main.css" + resources.Get "custom.css"), so
-   it replaces hugo-paper's own placeholder assets/custom.css. Plain CSS only; if you ever
-   want Tailwind's @apply here, add `@reference` to the theme's assets/app.css first. */
+/* ============================================================================
+   Lotp's Blog — the edition.
+   ----------------------------------------------------------------------------
+   The site's only stylesheet. Hugo concatenates it after nothing else: the
+   theme's compiled Tailwind (assets/main.css) is no longer loaded, so every
+   colour, rule, measure, state and movement on every page comes from this file.
+   It replaces hugo-paper's placeholder assets/custom.css (project assets win),
+   and it is the single source of truth for spacing and colour — change a token
+   here, never a selector in a template.
 
-/* Header nav spacing: one even gap between the social icons, the language switch and the
-   dark-mode toggle. hugo-paper spaces that row with `space-x-10` (2.5rem) between items
-   plus per-group `lg:ml-14` / `lg:ml-10` offsets, so the gaps are unequal and wide. The
-   margins are cancelled and replaced by a single gap — this is the only place to change it.
-   !important is required: Tailwind v4 compiles its utilities as
-   `:where(.space-x-10 > …):not(#\#):not(#\#)…`, which lands at specificity (0,4,0). */
+   The world: a bilingual printed edition. The display face sets the edition's
+   apparatus only — masthead, running heads, year markers, index labels, dates,
+   pagination. It never sets content; content is set in the text faces (a
+   workhorse UI stack for Latin, Songti for Chinese prose) so long titles and
+   long paragraphs stay readable. Ink is reserved for the record or technique the
+   reader is currently on; blue is navigation only.
+
+   scripts/i18n-smoke.sh asserts that --nav-gap ships in the built CSS. It is
+   the header control gap and it stays here; the check fails if it disappears.
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   1. Typeface
+
+   Archivo Narrow (SIL OFL 1.1) is self-hosted from static/fonts/, latin subset,
+   variable weight axis. It is a condensed editorial grotesque: it fits a whole
+   record title inside a ledger row at chrome sizes, which is why the apparatus
+   is set in it. Latin body text deliberately does NOT use it.
+
+   Chinese prose is set in Songti (宋体) — the face Chinese readers read books in
+   — and Chinese headings in the sans (PingFang / Heiti). That pairing is how a
+   中英对照 edition actually looks; the stacks are ordered so Latin glyphs come
+   from the Latin face and CJK glyphs fall through to the CJK face automatically.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Archivo Narrow";
+  src: url("/fonts/archivo-narrow-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --nav-gap: 0.75rem;
+  --f-display: "Archivo Narrow", "Arial Narrow", sans-serif;
+  --f-text: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "PingFang SC", "Hiragino Sans GB", "Songti SC", "Noto Sans CJK SC", sans-serif;
+  --f-cjk: "Songti SC", "STSong", "Hiragino Mincho Per Six", "Source Han Serif SC",
+    "Noto Serif CJK SC", SimSun, serif;
+  --f-cjk-head: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+  --f-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* Latin-leaning by default; [lang="zh"] swaps prose to Songti. */
+  --font-body: var(--f-text);
+  --font-head: var(--f-text);
 }
 
-.nav-wrapper > nav,
-.nav-wrapper > nav > *,
-.nav-wrapper > div,
-.nav-wrapper > div > * {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+:lang(zh) {
+  --font-body: var(--f-cjk);
+  --font-head: var(--f-cjk-head);
 }
 
-.nav-wrapper > nav,
-.nav-wrapper > div {
+/* ----------------------------------------------------------------------------
+   2. Ink and paper
+
+   Day edition: cool paper (deliberately not cream), graphite ink, technical blue
+   for navigation, brick reserved for the record or technique the reader is on.
+   Night edition: the same page printed on slate in chalk — not black-with-neon,
+   the accents are dimmed with the paper so the contrast relationship holds.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --paper: #f2f3f4;
+  --paper-2: #e8eaec;
+  --plate: #1b2023; /* code plates: the one dark surface, in both editions */
+  --ink: #1a1a1f;
+  --ink-2: #4c5257;
+  --ink-3: #5f666c;
+  --rule: #c7ccd1;
+  --rule-2: #9ba2a8;
+  --nav: #2f5d8a;
+  --nav-hover: #1f4468;
+  --mark: #b03f26;
+  --on-plate: #e6e9ea;
+
+  --nav-gap: 0.75rem; /* asserted by scripts/i18n-smoke.sh */
+
+  --g-1: 0.5rem;
+  --g-2: 1rem;
+  --g-3: 1.5rem;
+  --g-4: 2.5rem;
+  --g-5: 4rem;
+
+  --measure-sheet: 1220px;
+  --measure-index: 264px;
+  /* Reading measure, counted in characters that actually get set: 1ch in the
+     body face is wider than an average character, so 57ch lands near 75
+     characters per line at 17px — the end of the comfortable band, not past it. */
+  --measure-read: 57ch;
+  --header-h: 64px;
+
+  /* The only spacing rhythm on the page. More above a heading than below it. */
+  --head-room: 2.75rem;
+  --head-room-after: 0.85rem;
+  --row-gap: 1.9rem;
+  --block-gap: 2.25rem;
+}
+
+html.dark {
+  --paper: #141719;
+  --paper-2: #1b2023;
+  --plate: #0f1214;
+  --ink: #e7eae6;
+  --ink-2: #a9b2b6;
+  --ink-3: #8b9499;
+  --rule: #2b3134;
+  --rule-2: #454d52;
+  --nav: #8fbcE6;
+  --nav-hover: #b6d6f2;
+  --mark: #e08166;
+  --on-plate: #e6e9ea;
+}
+
+/* Whole-step state changes: nothing half-faded. Every transition is a short
+   discrete move; prefers-reduced-motion gets the same states with no movement. */
+:root {
+  --step: 120ms;
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+html.not-ready *,
+html.not-ready *::before,
+html.not-ready *::after {
+  transition: none !important;
+}
+
+/* ----------------------------------------------------------------------------
+   3. Base, and the browser-owned parts of the page
+
+   Selection, caret, focus ring, scrollbar, underline offset and tabular numerals
+   belong to no stylesheet until this stylesheet claims them.
+   --------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-color: var(--rule-2) var(--paper);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--mark);
+  color: #fff;
+}
+
+input,
+textarea {
+  caret-color: var(--nav);
+}
+
+a {
+  color: var(--nav);
+  text-decoration-color: color-mix(in srgb, var(--nav) 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color var(--step) var(--ease), text-decoration-color var(--step) var(--ease);
+}
+
+a:hover {
+  color: var(--nav-hover);
+  text-decoration-color: currentColor;
+}
+
+a:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--mark);
+  outline-offset: 3px;
+  border-radius: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  text-wrap: balance;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 var(--g-2);
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--f-mono);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: var(--block-gap) 0;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Hidden until the keyboard reaches it: the skip link on the title page. */
+.visually-hidden-focusable:not(:focus-visible):not(:focus) {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Small tracked capitals: the edition's label voice. Chrome only — never a
+   kicker standing above a heading, and never content. */
+.label {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.num {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0.06em;
+}
+
+/* ----------------------------------------------------------------------------
+   4. The sheet: running head, page, colophon
+   --------------------------------------------------------------------------- */
+
+.sheet {
+  max-width: var(--measure-sheet);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+}
+
+.running-head {
+  display: flex;
+  align-items: center;
+  gap: var(--nav-gap);
+  min-height: var(--header-h);
+  border-bottom: 1px solid var(--rule);
+  flex-wrap: nowrap;
+}
+
+.running-head__id {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.running-head__spacer {
+  margin-left: auto;
+}
+
+.running-head__id:hover {
+  color: var(--ink);
+}
+
+.running-head__name {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* On inner pages the running head carries the section, the way a book's running
+   head names the part you are in. */
+.running-head__part {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.running-head__controls {
+  display: flex;
+  align-items: center;
   gap: var(--nav-gap);
 }
 
-/* Between the groups only on desktop; on mobile they stack and keep their vertical rhythm. */
-@media (min-width: 64rem) {
-  .nav-wrapper {
-    gap: var(--nav-gap);
+/* Social: drawn glyphs from the icon set the theme ships, in one weight. */
+.social {
+  display: flex;
+  align-items: center;
+  gap: var(--nav-gap);
+}
+
+.social a {
+  display: block;
+  width: 20px;
+  height: 20px;
+  /* The glyph is the visible label; the name stays in the accessible name. With
+     no font-size the words take up no room, so nothing can spill over the
+     neighbouring control. */
+  font-size: 0;
+  overflow: hidden;
+  background: var(--url) center / 18px 18px no-repeat;
+  filter: grayscale(1) brightness(0.55);
+  transition: filter var(--step) var(--ease);
+}
+
+html.dark .social a {
+  filter: grayscale(1) brightness(1.6);
+}
+
+.social a:hover,
+.social a:focus-visible {
+  filter: grayscale(0) brightness(1);
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.lang-switch a {
+  display: inline-block;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--rule-2);
+  color: var(--nav);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.lang-switch a:hover,
+.lang-switch a:focus-visible {
+  border-color: var(--nav);
+  background: var(--paper-2);
+  color: var(--nav-hover);
+}
+
+/* Dark/light: a drawn dial, not an emoji or a stock glyph. Day prints the left
+   half inked; night prints it as a crescent. The swap is one step. */
+.btn-dark {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.btn-dark svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.btn-dark .dial {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.btn-dark .shade {
+  fill: currentColor;
+  stroke: none;
+}
+
+html.dark .btn-dark .shade {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.btn-dark:hover {
+  color: var(--mark);
+}
+
+.page {
+  position: relative;
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding-bottom: var(--g-5);
+}
+
+/* ----------------------------------------------------------------------------
+   5. Front matter (home) — the masthead, not a hero
+   --------------------------------------------------------------------------- */
+
+.frontmatter {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: var(--g-3) 0 var(--g-3);
+  border-bottom: 2px solid var(--ink);
+}
+
+.masthead {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 4.4vw, 3.25rem);
+  line-height: 0.95;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+
+.masthead a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A technique or section heading uses the same voice at a size that fits a
+   multi-word name instead of a four-letter one. */
+.masthead--part {
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.frontmatter--part {
+  padding-top: var(--g-1);
+  padding-bottom: var(--g-3);
+}
+
+.imprint {
+  justify-self: end;
+  text-align: right;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.imprint p {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.imprint .imprint__bio {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  white-space: normal;
+  max-width: 34ch;
+}
+
+/* ----------------------------------------------------------------------------
+   6. The spread: index (left) and contents ledger (right)
+   --------------------------------------------------------------------------- */
+
+.spread {
+  display: grid;
+  grid-template-columns: var(--measure-index) 1fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  padding-top: var(--g-4);
+  align-items: start;
+}
+
+.index {
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+  display: grid;
+  gap: var(--g-3);
+}
+
+.index__title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 var(--g-2);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+:lang(zh) .index__title {
+  font-family: var(--f-cjk-head);
+  letter-spacing: 0.06em;
+}
+
+/* Techniques. Two or more records = a counted entry; a single record is set as
+   a plain name in the tail line, so the index never reads as 26 rows of one. */
+.index__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.index__list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.index__list a {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.index__list a:hover,
+.index__list a:focus-visible {
+  color: var(--nav);
+  text-decoration: underline;
+}
+
+.index__count {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: var(--ink-3);
+}
+
+.index__singles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  line-height: 1.9;
+}
+
+.index__singles a {
+  color: var(--ink-2);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+
+.index__singles a:hover {
+  color: var(--nav);
+  border-color: var(--nav);
+}
+
+.index__more {
+  margin: 0.7rem 0 0;
+}
+
+.index__more a {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--nav);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--nav) 35%, transparent);
+}
+
+.index__more a:hover {
+  border-color: var(--nav);
+}
+
+/* Year spine: jump links into the ledger. */
+.years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.years a {
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--rule);
+}
+
+.years a:hover,
+.years a:focus-visible {
+  color: var(--nav);
+  border-color: var(--nav);
+}
+
+.years [aria-current] {
+  color: var(--mark);
+  border-color: var(--mark);
+}
+
+/* Author plate: the personal-brand apparatus, in the reader's own words. */
+.author {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 0.9rem;
+  padding-top: var(--g-3);
+  border-top: 1px solid var(--rule);
+}
+
+.author__portrait {
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  border: 1px solid var(--rule-2);
+  clip-path: inset(0);
+}
+
+.author__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author__name {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 0.15rem;
+}
+
+.author__bio {
+  margin: 0 0 0.6rem;
+  font-size: 0.92rem;
+  color: var(--ink-2);
+}
+
+.author__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.author__links a {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  gap: 0.5rem;
+}
+
+.author__links a:hover {
+  color: var(--nav);
+}
+
+.author__links span:first-child {
+  color: var(--nav);
+}
+
+/* ----------------------------------------------------------------------------
+   7. Contents ledger
+   --------------------------------------------------------------------------- */
+
+.contents {
+  border-top: 2px solid var(--ink);
+  padding-top: 0.9rem;
+}
+
+.contents__title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--ink);
+}
+
+:lang(zh) .contents__title {
+  font-family: var(--f-cjk-head);
+  letter-spacing: 0.06em;
+}
+
+.year {
+  margin-top: var(--head-room);
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+.year__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--row-gap);
+}
+
+.year__mark {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin: 0;
+  padding-bottom: 0.45rem;
+  margin-bottom: var(--g-2);
+  border-bottom: 1px solid var(--ink);
+}
+
+.year__num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.year__count {
+  font-family: var(--f-display);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.records {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--row-gap);
+}
+
+.rec {
+  display: grid;
+  grid-template-columns: 6.2rem 1fr;
+  gap: 1.2rem;
+  align-items: baseline;
+  padding: 0.15rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--rule) 65%, transparent);
+}
+
+.rec:last-child {
+  border-bottom: 0;
+}
+
+.rec__date {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+.rec__main {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rec__title {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  line-height: 1.4;
+  font-weight: 700;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.rec__title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rec:hover .rec__title a,
+.rec__title a:hover,
+.rec__title a:focus-visible {
+  color: var(--nav);
+}
+
+.rec__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--f-display);
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.rec__tags a {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.rec__tags a:hover {
+  color: var(--nav);
+  border-color: var(--nav);
+}
+
+/* The facing pair: two halves printed under one date, joined by a rule, sharing
+   one folio. Only a record with a twin prints this way — an Untranslated post
+   simply holds the full measure, with no empty half and no apology. */
+.rec[data-paired] {
+  grid-template-columns: 6.2rem 1fr 1px 1fr;
+}
+
+.rec__gutter {
+  align-self: stretch;
+  background: var(--rule);
+  width: 1px;
+}
+
+.rec__twin {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rec__twin-link {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+  text-wrap: pretty;
+}
+
+.rec:hover .rec__twin-link {
+  color: var(--nav);
+}
+
+.rec__twin-label {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* Named states, never colour alone. */
+.state {
+  display: inline-block;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mark);
+}
+
+/* The full terms index (/tags/) — every technique, counted. */
+.terms {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.2rem 2rem;
+}
+
+.terms li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
+}
+
+.terms a {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.terms a:hover {
+  color: var(--nav);
+}
+
+/* Isolate-and-dim: the technique you are on is solid and labelled in words; the
+   rest stay present, dimmed. */
+.index[data-isolated] .index__list a {
+  color: var(--ink-3);
+}
+
+.index[data-isolated] .index__list a:hover {
+  color: var(--nav);
+}
+
+.index[data-isolated] .index__list a[aria-current="true"],
+.index[data-isolated] .index__list a[aria-current="true"]:hover {
+  color: var(--mark);
+}
+
+.index [aria-current="true"] + .index__count {
+  color: var(--mark);
+}
+
+/* ----------------------------------------------------------------------------
+   8. Pagination — page turns, not pills
+   --------------------------------------------------------------------------- */
+
+.turn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: var(--head-room);
+  padding-top: var(--g-2);
+  border-top: 1px solid var(--ink);
+}
+
+.turn__where {
+  font-family: var(--f-display);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.turn a {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--nav);
+}
+
+.turn a:hover {
+  color: var(--nav-hover);
+  text-decoration: underline;
+}
+
+.turn__nav {
+  display: flex;
+  gap: 1.25rem;
+}
+
+/* ----------------------------------------------------------------------------
+   9. The record page (Read)
+   --------------------------------------------------------------------------- */
+
+.record {
+  max-width: var(--measure-read);
+  /* A text block sits centred between the page margins; the sheet keeps its
+     width so the running head and colophon stay in the same place on every page
+     of the edition. */
+  margin-inline: auto;
+}
+
+.record__head {
+  padding-bottom: var(--g-3);
+  margin-bottom: var(--block-gap);
+  border-bottom: 2px solid var(--ink);
+}
+
+.record__title {
+  font-size: clamp(1.7rem, 3.6vw, 2.3rem);
+  line-height: 1.16;
+  margin: 0 0 var(--head-room-after);
+  overflow-wrap: anywhere;
+}
+
+/* The meta rule is set in the apparatus face: this record's date, its language,
+   its techniques. Its date prints in the reserved ink — you are on it. */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 1.1rem;
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.meta time {
+  color: var(--mark);
+  font-weight: 600;
+}
+
+.meta .meta__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.meta a {
+  color: var(--nav);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--nav) 35%, transparent);
+}
+
+.meta a:hover {
+  border-color: var(--nav);
+}
+
+.record__body {
+  font-size: 1.0625rem;
+  line-height: 1.78;
+}
+
+:lang(zh) .record__body {
+  line-height: 1.95;
+  letter-spacing: 0.01em;
+  hyphens: none;
+}
+
+.record__body > *:first-child {
+  margin-top: 0;
+}
+
+.record__body p {
+  margin: 0 0 var(--g-2);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.record__body h1,
+.record__body h2,
+.record__body h3,
+.record__body h4 {
+  margin: var(--head-room) 0 var(--head-room-after);
+  line-height: 1.25;
+}
+
+.record__body h2 {
+  font-size: 1.45rem;
+}
+
+.record__body h3 {
+  font-size: 1.2rem;
+}
+
+.record__body h4 {
+  font-size: 1.05rem;
+}
+
+.record__body ul,
+.record__body ol {
+  margin: 0 0 var(--g-2);
+  padding-left: 1.35rem;
+}
+
+.record__body li {
+  margin: 0.35rem 0;
+}
+
+.record__body li::marker {
+  color: var(--ink-3);
+}
+
+.record__body blockquote {
+  margin: var(--block-gap) 0;
+  padding: 0 0 0 var(--g-3);
+  border-left: 0;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: var(--g-2);
+  color: var(--ink-2);
+  font-style: normal;
+}
+
+.record__body :not(pre) > code,
+.record__body kbd {
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.record__body a {
+  color: var(--nav);
+}
+
+/* Code plates print dark in both editions — a plate is the one dark surface on
+   a printed page, and it is the only place this site shows a second ground.
+   Hugo's highlighter emits token classes (markup.highlight noClasses = false),
+   so the colours below are this stylesheet's, and they hold in either edition.
+   The plate lives on the <pre> itself, not on the .highlight wrapper: this
+   author's oldest records contain indented code blocks too, which goldmark
+   renders as a bare <pre> with no wrapper, and an ASCII diagram wider than a
+   phone has to scroll inside its own plate rather than widen the page. */
+.record__body .highlight,
+.record__body pre {
+  margin: var(--block-gap) 0;
+}
+
+.record__body .highlight {
+  background: none;
+}
+
+.record__body pre,
+.record__body pre.chroma,
+.record__body .highlight pre {
+  background: var(--plate);
+  border-top: 1px solid var(--rule-2);
+  border-bottom: 1px solid var(--rule-2);
+  color: var(--on-plate);
+  margin: 0;
+  padding: 1rem 1.15rem;
+  font-size: 0.9rem;
+  line-height: 1.62;
+  direction: ltr;
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-color: var(--rule-2) transparent;
+}
+
+.record__body .highlight code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.record__body .highlight .ch,
+.record__body .highlight .line,
+.record__body .highlight .cl {
+  display: block;
+}
+
+/* Syntax roles, five of them, drawn from the same palette as the page: chalk
+   for what runs, blue for the words a language reserves, sand for text inside
+   code, brick for quantities and for anything that errored, grey for the
+   commentary. They are set on the plate, so both editions read the same code. */
+.record__body .highlight .c1,
+.record__body .highlight .cm,
+.record__body .highlight .cp,
+.record__body .highlight .cpf,
+.record__body .highlight .ch {
+  color: #8b949b;
+  font-style: normal;
+}
+
+.record__body .highlight .k,
+.record__body .highlight .kd,
+.record__body .highlight .kr,
+.record__body .highlight .kn,
+.record__body .highlight .kc,
+.record__body .highlight .kt,
+.record__body .highlight .ow {
+  color: #8fbcE6;
+}
+
+.record__body .highlight .s1,
+.record__body .highlight .s2,
+.record__body .highlight .sb,
+.record__body .highlight .si,
+.record__body .highlight .sh {
+  color: #d9b38c;
+}
+
+.record__body .highlight .mi,
+.record__body .highlight .mf,
+.record__body .highlight .mh,
+.record__body .highlight .mo,
+.record__body .highlight .err {
+  color: #e08166;
+}
+
+.record__body .highlight .nf,
+.record__body .highlight .nc,
+.record__body .highlight .nb,
+.record__body .highlight .bp {
+  color: #cfd8ce;
+}
+
+.record__body .highlight .o,
+.record__body .highlight .p,
+.record__body .highlight .n,
+.record__body .highlight .nx {
+  color: var(--on-plate);
+}
+
+/* Tables in prose. */
+.record__body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--block-gap) 0;
+  font-size: 0.95rem;
+}
+
+.record__body th,
+.record__body td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.record__body thead th {
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--f-display);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+
+.record__body tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--paper-2) 65%, transparent);
+}
+
+/* Figures. Captions only where the article supplies alt text — nothing is
+   invented under an image. */
+.record__body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: var(--block-gap) 0 0.4rem;
+  border: 1px solid var(--rule);
+}
+
+.record__body figure {
+  margin: var(--block-gap) 0;
+}
+
+.record__body figure figcaption {
+  font-family: var(--f-display);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* Facing pair, printed at the end of a record when a twin exists. */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+  margin-top: var(--head-room);
+  padding-top: var(--g-2);
+  border-top: 2px solid var(--ink);
+}
+
+.pair__gutter {
+  background: var(--rule);
+  width: 1px;
+}
+
+.pair a {
+  display: block;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.pair a:hover {
+  color: var(--nav);
+}
+
+.pair .label {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+/* One half is always filled: the record being read, named and marked, opposite
+   its twin. A pair band is never a half-empty row. */
+.pair__current {
+  display: block;
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.pair__half--here .label {
+  color: var(--mark);
+}
+
+/* Next and previous, named: the next record is already resolved, not an arrow. */
+.adjacent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: var(--block-gap);
+  padding-top: var(--g-2);
+  border-top: 1px solid var(--rule);
+}
+
+.adjacent a {
+  display: grid;
+  gap: 0.3rem;
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.adjacent a:hover {
+  color: var(--nav);
+}
+
+.adjacent a:last-child {
+  text-align: right;
+}
+
+/* ----------------------------------------------------------------------------
+   10. Colophon
+   --------------------------------------------------------------------------- */
+
+.colophon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.25rem;
+  margin-top: var(--g-5);
+  padding-top: var(--g-2);
+  border-top: 1px solid var(--rule);
+  font-family: var(--f-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.colophon a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.colophon a:hover {
+  color: var(--nav);
+}
+
+/* ----------------------------------------------------------------------------
+   11. Not found
+   --------------------------------------------------------------------------- */
+
+.notfound {
+  display: grid;
+  gap: var(--g-2);
+  max-width: 46ch;
+}
+
+.notfound h1 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   12. The spread at narrow widths: the index plan travels with the ledger
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .spread {
+    grid-template-columns: 1fr;
+    gap: var(--g-4);
+  }
+
+  .index {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--paper);
+    padding: 0.7rem 0;
+    gap: var(--g-2);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* On a phone the plan is a compact strip above the ledger rather than a
+     column, and never hidden behind a menu. The full index is always one link
+     away at /tags/, so the strip can stay short. */
+  .index .index__block--author,
+  .index .index__title--full,
+  .index .index__singles {
+    display: none;
+  }
+
+  .index__block {
+    display: contents;
+  }
+
+  .index__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+  }
+
+  .index__list li {
+    grid-template-columns: auto auto;
+  }
+
+  .index__list li:nth-child(n + 7) {
+    display: none;
+  }
+
+  .index__count {
+    font-size: 0.72rem;
+  }
+
+  .index__more {
+    margin: 0.2rem 0 0;
+  }
+
+  .frontmatter {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .imprint {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .imprint p {
+    white-space: normal;
   }
 }
 
-/* Home page: the gap between the top bar and the profile (avatar + name + bio).
-   hugo-paper writes it twice — `pt-14` on <main> in themes/hugo-paper/layouts/_default/
-   baseof.html, then `-mt-2 mb-12` on the avatar block in layouts/_default/list.html.
-   Both utilities ARE compiled — `.pt-14` lands at specificity (0,5,0) — so a bare element
-   selector only wins with !important. Measured with scripts/measure-home-gap.sh (CSS loading
-   asserted — see the warning in that script about baseURL and cross-origin CSS):
-     untouched theme ................. 48px  header → profile
-     --home-gap: 2rem, no lift ....... 32px
-     --home-gap: 0, --profile-lift: 1rem  16px
-   A profile is an identity block: it reads better tucked up under the site title than
-   separated from it, which is what --profile-lift buys. The lift is capped by the title's
-   own text box (header 72px tall, title text ends at y≈51): at 1rem the avatar top is
-   y=56 and clear; 1.5rem and above overlap the title on desktop and the avatar covers it.
-   1rem is therefore the largest usable lift — do not raise it without re-measuring
-   --profile-lift against `header > div > a`.
-   The profile block's own bottom margin is restored from hugo-paper's `mb-12` value (3rem),
-   NOT re-chosen here: that keeps the profile → first-post rhythm the theme already has, so
-   this file changes only the top gap. If you ever want the list tighter, that is a separate
-   decision from the header gap — change --post-gap deliberately, not as a side effect.
-   Article pages keep --article-gap (1.75rem, bar → title): they have no profile to tuck
-   under the bar, so a zero gap there reads as a clipping error, not as tight layout. */
-:root {
-  --home-gap: 0px;
-  --profile-lift: 1rem;
-  --post-gap: 3rem; /* = hugo-paper's mb-12 on the avatar block; unchanged on purpose */
-  --article-gap: 1.75rem;
+@media (max-width: 720px) {
+  body {
+    font-size: 16px;
+  }
+
+  .running-head {
+    flex-wrap: wrap;
+    gap: 0.55rem var(--nav-gap);
+    padding: 0.6rem 0;
+    min-height: 0;
+  }
+
+  .running-head__spacer {
+    display: none;
+  }
+
+  .running-head__id {
+    margin-right: 0;
+  }
+
+  .running-head__part {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .rec,
+  .rec[data-paired] {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .rec__gutter {
+    display: none;
+  }
+
+  .rec[data-paired] {
+    border-left: 0;
+  }
+
+  .rec__date {
+    font-size: 0.75rem;
+  }
+
+  .rec__title {
+    font-size: 1.2rem;
+  }
+
+  .adjacent,
+  .pair {
+    grid-template-columns: 1fr;
+  }
+
+  .pair__gutter {
+    display: none;
+  }
+
+  .adjacent a:last-child {
+    text-align: left;
+  }
+
+  .author {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .author__portrait {
+    width: 56px;
+    height: 56px;
+  }
+
+  .terms {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* Articles and tag pages. */
-main {
-  padding-top: var(--article-gap) !important;
+/* The pair never prints a half-empty row: below 720px a paired record prints its
+   twin directly under its own title, which is the same content with no gap. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-/* The home page IS the list template with the profile block as its first element —
-   hugo-paper ships no home.html — so :has() tells the home page apart from a post without
-   adding a template or a class. */
-main:has(> div:first-of-type img[alt]) {
-  padding-top: var(--home-gap) !important;
+/* The ledger does not animate itself in: a row's date and title hold their full
+   contrast at every scroll position, and a printed page does not fade itself into
+   view. The one authored interaction belongs to the subject instead — a paired
+   record opens. The centre rule draws its full length, the joining hairline
+   takes the reserved ink, the twin title takes its underline. Whole steps,
+   120ms, only on a row that really has a twin, triggered by the reader reaching
+   for it. */
+.rec[data-paired] .rec__gutter {
+  transform-origin: center;
+  transform: scaleY(0.42);
+  transition: transform var(--step) var(--ease);
 }
 
-/* Only the top of the profile block is retuned; margin-bottom reproduces the theme. */
-main > div:first-of-type {
-  margin-top: calc(var(--profile-lift) * -1) !important;
-  margin-bottom: var(--post-gap) !important;
+.rec[data-paired]:hover .rec__gutter,
+.rec[data-paired]:focus-within .rec__gutter {
+  transform: scaleY(1);
+}
+
+.rec[data-paired] .rec__twin {
+  transition: color var(--step) var(--ease);
+}
+
+.rec[data-paired]:hover .rec__twin-label,
+.rec[data-paired]:focus-within .rec__twin-label {
+  color: var(--mark);
+}
+
+.rec[data-paired]:hover .rec__twin-link,
+.rec[data-paired]:focus-within .rec__twin-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rec[data-paired] .rec__gutter {
+    transform: none;
+    transition: none;
+  }
 }

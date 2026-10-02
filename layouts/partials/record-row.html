@@ -1,0 +1,54 @@
+{{- /*
+  record-row.html — one line of the contents ledger.
+
+  Usage: partial "record-row.html" (dict "page" $p)
+
+  A record with a twin prints as two halves joined by a gutter rule under one
+  date — that is the facing pair, and it is the only place the site shows a
+  record twice. A record without a twin keeps the full measure: no empty half,
+  no placeholder, no "missing translation" label. An Untranslated post is a
+  legal, permanent state (CONTEXT.md), and nothing in this row may imply it is
+  a debt.
+*/ -}}
+{{- $p := .page -}}
+{{- $twins := slice -}}
+{{- range $t := $p.Translations -}}
+{{- if ne $t.Language.Lang site.Language.Lang -}}
+{{- $twins = $twins | append $t -}}
+{{- end -}}
+{{- end -}}
+{{- $twin := index $twins 0 -}}
+<li class="rec"{{- if $twin }} data-paired="true"{{- end -}}>
+  <time
+    class="rec__date"
+    datetime="{{- $p.Date.Format "2006-01-02" -}}"
+    >{{- $p.Date.Format (i18n "chrome_date_format") -}}</time>
+
+  <div class="rec__main">
+    <h3 class="rec__title">
+      <a href="{{- $p.RelPermalink -}}">{{- $p.Title -}}</a>
+    </h3>
+    {{- with $p.Params.tags -}}
+    <ul class="rec__tags">
+      {{- range . -}}
+      <li>
+        <a href="{{- print (absLangURL "tags/") (urlize .) -}}">{{- . -}}</a>
+      </li>
+      {{- end -}}
+    </ul>
+    {{- end -}}
+  </div>
+
+  {{- if $twin -}}
+  <span class="rec__gutter" aria-hidden="true"></span>
+  <div class="rec__twin">
+    <span class="rec__twin-label"
+      >{{- or $twin.Language.Label $twin.Language.Lang -}}</span>
+    <a
+      class="rec__twin-link"
+      hreflang="{{- $twin.Language.Locale -}}"
+      href="{{- $twin.RelPermalink -}}"
+      >{{- $twin.Title -}}</a>
+  </div>
+  {{- end -}}
+</li>

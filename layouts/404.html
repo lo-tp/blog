@@ -1,0 +1,12 @@
+{{- /* 404.html — the edition's missing page: an index card, not a shrug. */ -}}
+{{- define "main" -}}
+<section class="notfound">
+  <h1>404</h1>
+  <p>{{- i18n "chrome_404" -}}</p>
+  <p>
+    <a href="{{- "/" | absLangURL -}}">{{- i18n "chrome_contents" -}}</a>
+    ·
+    <a href="{{- "tags/" | absLangURL -}}">{{- i18n "chrome_all_techniques" -}}</a>
+  </p>
+</section>
+{{- end -}}

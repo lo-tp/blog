@@ -1,0 +1,80 @@
+{{- /*
+  head.html — the edition's head.
+
+  Only this project's stylesheet is loaded: resources/custom.css, concatenated
+  under the name main.css so the built file keeps the name
+  scripts/i18n-smoke.sh greps for the --nav-gap rule in. The theme's compiled
+  Tailwind (assets/main.css inside hugo-paper) is not requested by any page any
+  more. highlight.min.js is not loaded either: code fences are already coloured
+  by Hugo's own highlighter at build time, so a second highlighter at runtime is
+  one more script for no gain.
+
+  theme-color below must match --paper in assets/custom.css; the header script
+  updates it the moment the reader switches editions.
+*/ -}}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#f2f3f4" />
+
+<title>
+  {{- if not .IsHome -}}{{- .Title }} · {{- end -}}{{- site.Title -}}
+</title>
+
+{{- $author := or .Params.author site.Params.author -}}
+{{- if .IsPage -}}
+<meta name="description" content="{{- .Description | default (plainify .Summary) -}}" />
+<meta name="author" content="{{- $author -}}" />
+{{- else -}}
+<meta
+  name="description"
+  content="{{- site.Params.description | default (i18n "chrome_imprint") -}}"
+/>
+<meta name="author" content="{{- $author | default site.Title -}}" />
+{{- end -}}
+
+{{- if hugo.IsProduction -}}
+{{- template "_internal/opengraph.html" . -}}
+{{- template "_internal/twitter_cards.html" . -}}
+{{- template "_internal/schema.html" . -}}
+{{- end -}}
+
+{{- /* The stylesheet: one file, fingerprinted. */ -}}
+{{- $css := resources.Get "custom.css" -}}
+{{- if not $css -}}
+{{- errorf "assets/custom.css is missing — the whole design lives in that file." -}}
+{{- end -}}
+{{- $css := slice $css | resources.Concat "main.css" | minify | fingerprint -}}
+<link
+  rel="preload"
+  as="style"
+  href="{{- $css.Permalink -}}"
+  integrity="{{- $css.Data.Integrity -}}"
+/>
+<link
+  rel="stylesheet"
+  href="{{- $css.Permalink -}}"
+  integrity="{{- $css.Data.Integrity -}}"
+/>
+
+{{- /* The one self-hosted face. */ -}}
+<link
+  rel="preload"
+  as="font"
+  type="font/woff2"
+  href="{{- "/fonts/archivo-narrow-latin.woff2" | absURL -}}"
+  crossorigin
+/>
+
+{{- if hugo.IsProduction -}}
+{{- range .AlternativeOutputFormats -}}
+<link rel="{{- .Rel -}}" type="{{- .MediaType.Type -}}" href="{{- .Permalink -}}" />
+{{- end -}}
+<link rel="canonical" href="{{- .Permalink -}}" />
+{{- end -}}
+
+{{- with site.Params.favicon | default "favicon.ico" -}}
+<link rel="icon" href="{{- . | absURL -}}" />
+{{- end -}}
+<link rel="apple-touch-icon" href="{{- "apple-touch-icon.png" | absURL -}}" />
+
+{{- hugo.Generator -}}

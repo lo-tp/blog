@@ -1,130 +1,120 @@
 {{- /*
-  Vendored copy of themes/hugo-paper/layouts/partials/header.html (hugo-paper 6.31.0).
-  Diff against the theme copy before updating the theme:
-    diff themes/hugo-paper/layouts/partials/header.html layouts/partials/header.html
-  Deliberate changes:
-    1. the language switch is rendered in the nav, after the social icons (LinkedIn is last
-       in hugo-paper's social order);
-    2. the dark-mode toggle moved from beside the site title to the end of that same nav
-       row, after the language switch;
-    3. because of 2, the header <script> moved to the end of <header> — it does
-       document.querySelector('.btn-dark'), which would find nothing where the toggle used
-       to sit. Do not move it back above the nav.
-  Spacing in that row is not set here: assets/custom.css replaces hugo-paper's unequal
-  space-x-10 / lg:ml-14 offsets with one even gap.
-  On desktop these land at the end of the nav row; on mobile they are in the menu overlay,
-  so the dark-mode toggle now takes two taps on a phone.
+  header.html — the running head.
+
+  A book's running head names the work and the part you are in. Here it is the
+  site name, the part of the edition being read, then the three controls the
+  reader may need on any page: the profile links, the language of this record,
+  and the day/night edition.
+
+  scripts/i18n-smoke.sh asserts the order of that row and of the script that
+  wires it: profile links -> language switch -> dark-mode toggle -> the script
+  that finds the toggle. Keep them in this order, and keep `class="btn-dark"`
+  and `btnDark = document.querySelector` intact.
+
+  Two things this row no longer does:
+    * It is not a menu any more. The controls are in the bar at every width, so
+      switching editions on a phone is one tap instead of two — the friction
+      docs/zh.md used to describe.
+    * The icons resolve at the site root. `./linkedin.svg`, as the theme wrote
+      it, resolves against the current page path and 404s on /tags/…/ pages.
 */ -}}
+<header class="sheet">
+  <div class="running-head">
+    {{- if .IsHome -}}
+    <a class="visually-hidden-focusable" href="#contents">{{- i18n "chrome_skip" -}}</a>
+    {{- else -}}
+    <a class="running-head__id" href="{{- "/" | absLangURL -}}">
+      <span class="running-head__name">{{- site.Params.name | default site.Title -}}</span>
+      {{- $part := i18n "chrome_record" -}}
+      {{- if or (eq .Kind "term") (eq .Kind "taxonomy") -}}
+      {{- $part = i18n "chrome_index" -}}
+      {{- end -}}
+      <span class="running-head__part">{{- $part -}}</span>
+    </a>
+    {{- end -}}
 
-<header
-  class="mx-auto flex h-[4.5rem] max-w-(--w) px-8 whitespace-nowrap lg:justify-center"
->
-  {{ template "_internal/opengraph.html" . }}
-  {{ template "_internal/twitter_cards.html" . }}
-  <div class="relative z-50 flex items-center ltr:mr-auto rtl:ml-auto">
-    <a
-      class="-translate-y-[1px] text-2xl font-medium"
-      href="{{- `` | absURL -}}"
-      >{{ site.Title }}</a
-    >
-  </div>
+    {{- /* The controls stay at the right edge of the measure at every width. */ -}}
+    <span class="running-head__spacer" aria-hidden="true"></span>
 
-  <div
-    class="btn-menu relative z-50 flex h-[4.5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden ltr:-mr-8 rtl:-ml-8"
-    role="button"
-    aria-label="Menu"
-  ></div>
+    {{- $services := slice -}}
+    {{- if site.Params.github -}}{{- $services = $services | append (dict "id" "github" "label" "GitHub" "href" (print "https://github.com/" site.Params.github)) -}}{{- end -}}
+    {{- if site.Params.twitter -}}{{- $services = $services | append (dict "id" "twitter" "label" "X" "href" (print "https://x.com/" site.Params.twitter)) -}}{{- end -}}
+    {{- if site.Params.linkedin -}}{{- $services = $services | append (dict "id" "linkedin" "label" "LinkedIn" "href" (print "https://www.linkedin.com/in/" site.Params.linkedin)) -}}{{- end -}}
 
-  {{- $bg_color := $.Scratch.Get "bg_color" -}}<!---->
-
-
-  <div
-    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full flex-col justify-center bg-(--bg) pb-16 duration-200 select-none lg:static lg:h-auto lg:flex-row lg:bg-transparent! lg:pb-0 lg:transition-none"
-  >
-    {{- $url := .RelPermalink -}}<!---->
-    {{- with site.Menus.main -}}
-    <nav
-      class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse"
-    >
+    {{- with $services -}}
+    <nav class="social" aria-label="{{- i18n "chrome_profile" -}}">
       {{- range . -}}
       <a
-        class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal"
-        href="{{- .URL -}}"
-        >{{- .Name -}}</a
-      >
+        data-social="{{- .id -}}"
+        style="--url: url({{- printf "%s.svg" .id | absURL -}})"
+        href="{{- .href -}}"
+        target="_blank"
+        rel="me noopener"
+        >{{- .label -}}</a>
       {{- end -}}
     </nav>
-    {{- end -}}<!---->
+    {{- end -}}
 
-    {{- with $.Scratch.Get "social_list" -}}
-    <nav
-      class="mt-12 flex justify-center space-x-10 lg:mt-0 lg:items-center ltr:lg:ml-14 rtl:space-x-reverse rtl:lg:mr-14 dark:invert"
-    >
-      {{- range . -}}<!---->
-      <a
-        class="h-7 w-7 text-[0px] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
-        style="--url: url(./{{- . -}}.svg)"
-        href="{{- if eq . `rss` -}}{{- `index.xml` | absURL -}}{{- else if eq . `mastodon` -}}{{- index site.Params . -}}{{- else -}}{{- if eq . `threads` -}}https://threads.net/{{- else if eq . `bluesky` -}}https://bsky.app/profile/{{- else -}}https://{{- . -}}.com/{{- end -}}{{- if eq . `linkedin` -}}in/{{- end -}}{{- index site.Params . -}}{{- end -}}"
-        target="_blank"
-        rel="{{- if eq . `rss` -}}alternate{{- else -}}me{{- end -}}"
-      >
-        {{- . -}}
-      </a>
-      {{- end -}}<!---->
-    </nav>
-    {{- end -}}<!---->
+    {{- partial "lang-switch.html" (dict "page" . "navClass" "lang-switch" "linkClass" "") -}}
 
-    {{- partial "lang-switch.html" (dict "page" . "navClass" "mt-12 lg:mt-0 flex justify-center lg:items-center" "linkClass" "block text-center text-xl leading-[5rem] lg:text-base lg:font-normal") -}}
-
-    <div class="mt-12 lg:mt-0 flex justify-center lg:items-center">
+    <div class="running-head__controls">
       <div
-        class="btn-dark text-[0px] h-6 w-6 shrink-0 cursor-pointer {{ if site.Params.monoDarkIcon }}[background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert{{ else }}[background:url(./theme.png)_left_center/_auto_theme('spacing.6')_no-repeat] [transition:_background-position_0.4s_steps(5)]{{ end }} dark:[background-position:right]"
+        class="btn-dark"
         role="button"
-        aria-label="Dark"
-      ></div>
+        tabindex="0"
+        aria-label="{{- i18n "chrome_theme_toggle" -}}"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="dial" cx="12" cy="12" r="8.5" />
+          <path class="shade" d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
+        </svg>
+      </div>
     </div>
 
-  <script>
-    // base
-    const htmlClass = document.documentElement.classList;
-    setTimeout(() => {
-      htmlClass.remove('not-ready');
-    }, 10);
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
 
-    // mobile menu
-    const btnMenu = document.querySelector('.btn-menu');
-    btnMenu.addEventListener('click', () => {
-      htmlClass.toggle('open');
-    });
+      // dark and light editions
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      const paper = "#f2f3f4";
+      const slate = "#141719";
+      const setDark = (isDark) => {
+        metaTheme.setAttribute("content", isDark ? slate : paper);
+        htmlClass[isDark ? "add" : "remove"]("dark");
+        try {
+          localStorage.setItem("dark", isDark);
+        } catch (e) {}
+      };
 
-    // dark theme
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    const lightBg = '{{- $bg_color -}}'.replace(/"/g, '');
-    const setDark = (isDark) => {
-      metaTheme.setAttribute('content', isDark ? "rgb(0 0 0 / 85%)" : lightBg);
-      htmlClass[isDark ? 'add' : 'remove']('dark');
-      localStorage.setItem('dark', isDark);
-    };
+      // init (baseof already applied the stored choice before paint)
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
 
-    // init
-    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-    if (htmlClass.contains('dark')) {
-      setDark(true);
-    } else {
-      const darkVal = localStorage.getItem('dark');
-      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
-    }
+      // follow the system until the reader overrides it
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
 
-    // listen system
-    darkScheme.addEventListener('change', (event) => {
-      setDark(event.matches);
-    });
-
-    // manual switch
-    const btnDark = document.querySelector('.btn-dark');
-    btnDark.addEventListener('click', () => {
-      setDark(localStorage.getItem('dark') !== 'true');
-    });
-  </script>
+      // the toggle itself
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+      btnDark.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setDark(localStorage.getItem("dark") !== "true");
+        }
+      });
+    </script>
   </div>
 </header>

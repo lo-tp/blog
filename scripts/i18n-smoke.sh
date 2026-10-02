@@ -66,21 +66,22 @@ contains "$out/zh/index.xml"  'blog.lotp.xyz/zh/posts'         'chinese feed is 
 
 contains "$en_fixture" 'data-lang-switch'                                  'a paired english post shows the language switch'
 if awk '/<\/header>/{ exit } { s = s $0 "\n" } END {
-    social = index(s, "url(./linkedin.svg)");
+    social = index(s, "data-social=\"linkedin\"");
     sw = index(s, "data-lang-switch");
     dark = index(s, "class=\"btn-dark");
     js = index(s, "btnDark = document.querySelector");
     if (social && sw && sw > social && dark && dark > sw && js && js > dark) print "ok"; else print "no"
   }' "$en_fixture" | grep -q ok; then
-  pass "header order: social icons -> language switch -> dark-mode toggle, then the script that wires it"
+  pass "header order: profile links -> language switch -> dark-mode toggle, then the script that wires it"
 else
-  fail "header order: social icons -> language switch -> dark-mode toggle, then the script that wires it"
+  fail "header order: profile links -> language switch -> dark-mode toggle, then the script that wires it"
 fi
 contains "$en_fixture" "blog.lotp.xyz/zh/posts/$fixture_slug/"           'the switch links to the chinese twin'
 contains "$zh_fixture" 'data-lang-switch'                                 'the chinese post shows the language switch back'
 contains "$zh_fixture" "blog.lotp.xyz/posts/$fixture_slug/"              'the switch links back to the english original'
 contains "$zh_fixture" '/zh/tags/'                                       'chinese tag links stay under /zh/ (absLangURL override intact)'
 contains "$zh_fixture" "$fixture_date"                                   'dates render in Chinese'
+contains "$out/zh/index.html" '生活中的每一天'                            'the chinese edition prints its own chrome, not the english values'
 
 unpaired=""
 for src in "$posts_dir"/*.md; do

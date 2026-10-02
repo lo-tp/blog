@@ -1,32 +1,45 @@
 #!/usr/bin/env bash
-# Measure the vertical gaps on the home page in headless Chromium.
+# Measure the vertical rhythm of the edition in headless Chromium.
 #
-# Why this exists: the top-bar → profile spacing comes from three places at once — hugo-paper's
-# `pt-14` on <main> (themes/hugo-paper/layouts/_default/baseof.html), `-mt-2 mb-12` on the avatar
-# block (vendored layouts/_default/list.html), and the overrides in assets/custom.css. Tailwind
-# compiles all of those utilities, and .pt-14 lands at specificity (0,5,0), so reading the CSS
-# cannot tell you the rendered gap. Only measuring it can.
+# Why this exists: the rhythm of a page is decided by several rules at once — the
+# running head's min-height, the front matter's padding, `.contents` top padding,
+# `.year` margins, `.records` gap, and the media queries that change all of them
+# below 1000px. Reading assets/custom.css cannot tell you the rendered distance
+# between two of them; only measuring it can. This script measures it, and fails
+# when the render disagrees with the tokens it is supposed to be producing.
+#
+# What it asserts (exit 1 on any failure):
+#   - a stylesheet actually loaded, and the self-hosted display face actually loaded;
+#   - the header controls appear in the contract order: profile links → language
+#     switch → dark-mode dial, and none of them overlap;
+#   - the running head is --header-h tall on desktop;
+#   - the title page's rhythm: masthead rule → contents → year marker → first row,
+#     and that rows inside one year group are --row-gap apart;
+#   - on a phone the index plan travels with the ledger (it stays sticky and on
+#     screen while the ledger is being read);
+#   - a record page sets its text block inside the reading measure and centres it;
+#   - nothing overflows the viewport horizontally at 1280px or 390px.
 #
 # Usage:
 #   scripts/measure-home-gap.sh                 # starts its own hugo server on :1314, measures, stops it
 #   scripts/measure-home-gap.sh http://localhost:1313   # measure a server you already have running
-#   POST_PATH=/posts/some-post/ scripts/measure-home-gap.sh   # also probe that post page
+#   POST_PATH=/posts/some-post/ scripts/measure-home-gap.sh   # also probe that record page
 #
 # CRITICAL, and the reason early measurements here were wrong: hugo.toml sets
 # baseURL = "https://blog.lotp.xyz/", so every asset URL in the served page is absolute and
 # points at the published site. `hugo server -b …` rewrites them (the long --baseURL form is
 # a build flag and is ignored by the server). Without that, Chromium ORB-blocks the
-# cross-origin stylesheet and the page
-# renders with NO CSS — which looks like "my override had no effect" when it is really "no CSS
-# was loaded". So this script serves with a local override config and asserts, in the browser,
-# that a stylesheet actually loaded before it reports any number.
+# cross-origin stylesheet and the page renders with NO CSS — which looks like "my change had
+# no effect" when it is really "no CSS was loaded". So this script serves with a local
+# baseURL override and asserts, in the browser, that a stylesheet and the display face loaded
+# before it reports any number.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PORT="${PORT:-1314}"
 
 find_playwright() {
-  for dir in "$ROOT" "$PWD" "${PLAYWRIGHT_DIR:-}" /tmp/pw /tmp/pwq "${HOME}/.cache/pw"; do
+  for dir in "$ROOT" "$PWD" "${PLAYWRIGHT_DIR:-}" /tmp/pwq /tmp/pw "${HOME}/.cache/pw"; do
     [ -n "$dir" ] && [ -d "$dir/node_modules/playwright" ] && { printf '%s' "$dir"; return 0; }
   done
   return 1
@@ -72,79 +85,170 @@ import { chromium } from 'playwright';
 const base = process.argv[2];
 const postPath = process.argv[3] || '';
 const browser = await chromium.launch();
+const fails = [];
+
+// Node-side helper: the page reports tokens as strings; compare them in px.
+const px = (value) => {
+  const n = parseFloat(value);
+  if (!Number.isFinite(n)) return null;
+  return String(value).includes('rem') ? Math.round(n * 16) : Math.round(n);
+};
+
+const fail = (label, what) => {
+  fails.push(`${label}: ${what}`);
+};
 
 const PROBE = () => {
+  const el = (sel) => document.querySelector(sel);
   const box = (sel) => {
-    const el = document.querySelector(sel);
-    if (!el) return null;
-    const b = el.getBoundingClientRect();
-    return { x: +b.x.toFixed(0), y: +b.y.toFixed(0), w: +b.width.toFixed(0), h: +b.height.toFixed(0), bottom: +b.bottom.toFixed(0) };
+    const node = el(sel);
+    if (!node) return null;
+    const b = node.getBoundingClientRect();
+    const round = (n) => +n.toFixed(0);
+    return { x: round(b.x), y: round(b.y), w: round(b.width), h: round(b.height), bottom: round(b.bottom), right: round(b.right) };
   };
-  const cs = (sel) => {
-    const el = document.querySelector(sel);
-    if (!el) return null;
-    const c = getComputedStyle(el);
-    return { paddingTop: c.paddingTop, marginTop: c.marginTop, marginBottom: c.marginBottom };
+  const gap = (a, b) => (a && b ? +(b.y - a.bottom).toFixed(0) : null);
+  const overlaps = (a, b) =>
+    !!a && !!b && !(a.right <= b.x || b.right <= a.x) && !(a.bottom <= b.y || b.bottom <= a.y);
+
+  const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const px = (value) => {
+    // Only the values this script compares: rem (against the root font size) and px.
+    const n = parseFloat(value);
+    if (!Number.isFinite(n)) return null;
+    return value.includes('rem') ? Math.round(n * 16) : Math.round(n);
   };
-  const PROFILE = 'main > div:first-of-type';
-  const header = box('header'), main = box('main'), profile = box(PROFILE), post = box('main > section');
-  const mainEl = document.querySelector('main');
-  // The home-only rule is `main:has(> div:first-of-type img[alt])`. If it stops matching —
-  // hugo-paper renamed the avatar block, a template added a wrapper, params.avatar removed —
-  // the home page silently falls back to the article gap and the change looks inert.
-  const homeGapApplied = !!mainEl && mainEl.matches('main:has(> div:first-of-type img[alt])');
-  const title = box('header > div > a'), avatar = box(PROFILE + ' > div:first-child');
-  const collides = !!(avatar && title) &&
-    !(avatar.bottom <= title.y || title.bottom <= avatar.y) &&
-    !(avatar.x + avatar.w <= title.x || title.x + title.w <= avatar.x);
+
+  const social = [...document.querySelectorAll('.social a')].map((a) => a.getBoundingClientRect());
+  const socialBoxes = social.map((b) => ({ x: +b.x.toFixed(0), right: +b.right.toFixed(0), y: +b.y.toFixed(0) }));
+  const lang = box('.lang-switch a') || box('.lang-switch');
+  const dial = box('.btn-dark');
+  const head = box('.running-head');
+  const masthead = box('.masthead');
+  const frontmatter = box('.frontmatter');
+  const contents = box('.contents');
+  const yearMark = box('.year__mark');
+  const rows = [...document.querySelectorAll('.rec')].map((r) => r.getBoundingClientRect());
+  const rowGaps = rows.slice(1).map((r, i) => +(r.y - rows[i].bottom).toFixed(0));
+  const record = box('.record');
+
+  const controlOrder = [
+    socialBoxes.length ? Math.max(...socialBoxes.map((b) => b.right)) : null,
+    lang ? lang.x : null,
+    dial ? dial.x : null,
+  ];
+  const ascending = controlOrder.every((v, i) => v === null || i === 0 || controlOrder[i - 1] === null || v >= controlOrder[i - 1]);
+
   return {
     cssSheetsLoaded: document.styleSheets.length,
-    mainCss: cs('main'),
-    profileCss: cs(PROFILE),
-    headerToProfile: header && profile ? +(profile.y - header.bottom).toFixed(0) : null,
-    profileToPost: profile && post ? +(post.y - profile.bottom).toFixed(0) : null,
-    headerToFirstPost: header && post ? +(post.y - header.bottom).toFixed(0) : null,
-    titleBox: title,
-    avatarTop: avatar ? avatar.y : null,
-    avatarCollidesWithTitle: collides,
-    homeGapApplied,
+    displayFaceLoaded: document.fonts.check('700 16px "Archivo Narrow"'),
+    tokens: { headerH: token('--header-h'), rowGap: token('--row-gap'), measure: token('--measure-read') },
+    runningHead: head,
+    controls: {
+      social: socialBoxes.length,
+      socialRightMost: socialBoxes.length ? Math.max(...socialBoxes.map((b) => b.right)) : null,
+      socialLabelSpill: socialBoxes.length < social.length ? 'n/a' : [...document.querySelectorAll('.social a')].filter((a) => a.scrollWidth > a.clientWidth + 1).length,
+      lang,
+      dial,
+      orderIsProfileThenLangThenDial: ascending,
+      anyPairOverlaps:
+        overlaps(socialBoxes[0], lang) ||
+        overlaps(lang, dial) ||
+        (socialBoxes.length > 1 && overlaps(socialBoxes[0], socialBoxes[1])),
+    },
+    rhythm: {
+      mastheadToContents: gap(masthead || frontmatter, contents),
+      mastheadToFirstYear: gap(masthead || frontmatter, yearMark),
+      yearToFirstRow:
+        yearMark && rows.length ? +(rows[0].top - yearMark.bottom).toFixed(0) : null,
+      rowGaps,
+    },
+    record: record
+      ? {
+          width: record.w,
+          centred: Math.abs(record.x + record.w / 2 - document.documentElement.clientWidth / 2) <= 24,
+        }
+      : null,
+    horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    overflowing: [...document.querySelectorAll('body *')]
+      .filter((e) => e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)
+      .slice(0, 4)
+      .map((e) => `${e.tagName}.${(e.className || '').toString().slice(0, 24)}`),
   };
 };
 
-const viewports = [['home 1100px', 1100, 900], ['home 390px (mobile)', 390, 844]];
-let failed = false;
-for (const [label, width, height] of viewports) {
+const homeViewports = [['title page 1280px', 1280, 900], ['title page 390px (phone)', 390, 844]];
+for (const [label, width, height] of homeViewports) {
   const page = await browser.newPage({ viewport: { width, height } });
   const blocked = [];
   page.on('requestfailed', (r) => blocked.push(`${r.url()} ${(r.failure() || {}).errorText}`));
   await page.goto(base + '/', { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
   const r = await page.evaluate(PROBE);
-  r.blockedRequests = blocked;
-  if (label.startsWith('home') && r.homeGapApplied === false) {
-    failed = true;
-    console.log(label, 'HOME GAP NOT APPLIED — main:has(> div:first-of-type img[alt]) did not match. The avatar block in the list template has changed shape; assets/custom.css selects it by structure, so update the selector.');
+
+  if (r.cssSheetsLoaded === 0) fail(label, 'NO CSS LOADED — is the page referencing a cross-origin baseURL? Serve with a local baseURL override.');
+  if (!r.displayFaceLoaded) fail(label, 'the self-hosted display face did not load (static/fonts/ or the @font-face url)');
+  if (r.controls.social === 0) fail(label, 'no profile links in the running head');
+  if (!r.controls.orderIsProfileThenLangThenDial) fail(label, 'header control order broken: must be profile links → language switch → dark-mode dial');
+  if (r.controls.anyPairOverlaps) fail(label, 'header controls overlap each other');
+  if (r.controls.socialLabelSpill > 0) fail(label, `${r.controls.socialLabelSpill} profile link(s) paint their label over the neighbouring control`);
+  // --header-h is the desktop running head; below 720px the controls wrap and the
+  // head is intentionally shorter, so height is only asserted at desktop width.
+  if (!label.includes('phone') && r.runningHead && r.tokens.headerH && Math.abs(r.runningHead.h - px(r.tokens.headerH)) > 2)
+    fail(label, `running head is ${r.runningHead.h}px, --header-h says ${r.tokens.headerH}`);
+  if (r.rhythm.yearToFirstRow !== null && r.rhythm.yearToFirstRow < 8)
+    fail(label, `a year marker sits ${r.rhythm.yearToFirstRow}px above its first row`);
+  if (r.rhythm.mastheadToContents !== null && r.rhythm.mastheadToContents < 24)
+    fail(label, `masthead rule sits ${r.rhythm.mastheadToContents}px above the contents plan — the title page has no breathing room`);
+  const rowGapPx = px(r.tokens.rowGap);
+  const tooTight = r.rhythm.rowGaps.filter((g) => rowGapPx && g < rowGapPx - 2 && g > 0);
+  if (tooTight.length) fail(label, `${tooTight.length} ledger row gap(s) below --row-gap (${r.tokens.rowGap}): ${tooTight.join(', ')}px`);
+  if (r.horizontalOverflow) fail(label, `page overflows its viewport horizontally: ${r.overflowing.join(', ')}`);
+
+  if (label.includes('phone')) {
+    await page.evaluate(() => window.scrollTo(0, 1400));
+    await page.evaluate(() => new Promise((res) => setTimeout(res, 350)));
+    const sticky = await page.evaluate(() => {
+      const idx = document.querySelector('.index');
+      if (!idx) return { present: false };
+      const b = idx.getBoundingClientRect();
+      return {
+        present: true,
+        position: getComputedStyle(idx).position,
+        onScreen: b.top >= 0 && b.top < window.innerHeight,
+        ledgerOnScreen: !!document.querySelector('.rec'),
+      };
+    });
+    if (!sticky.present || !sticky.onScreen || sticky.position !== 'sticky')
+      fail(label, 'the index plan does not travel with the ledger on a phone');
   }
-  if (r.cssSheetsLoaded === 0) {
-    failed = true;
-    console.log(label, 'NO CSS LOADED — the stylesheet was not applied. blocked:', blocked);
-    console.log('  Is the page referencing a cross-origin baseURL (hugo.toml baseURL)? Serve with a local baseURL override.');
-  } else {
-    console.log(label, JSON.stringify(r));
-  }
+
+  console.log(label, JSON.stringify(r));
   await page.close();
 }
 
 if (postPath) {
-  const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.goto(base + postPath, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
-  console.log('post page', JSON.stringify(await page.evaluate(PROBE)));
+  const r = await page.evaluate(PROBE);
+  if (!r.record) fail('record page', 'no .record on the page — single.html changed shape');
+  else {
+    if (r.record.width > 640) fail('record page', `text block is ${r.record.width}px wide — over the reading measure`);
+    if (!r.record.centred) fail('record page', 'the text block is not centred between the sheet margins');
+  }
+  if (r.horizontalOverflow) fail('record page', `page overflows its viewport horizontally: ${r.overflowing.join(', ')}`);
+  console.log('record page', JSON.stringify(r));
   await page.close();
 }
 
 await browser.close();
-process.exit(failed ? 1 : 0);
+if (fails.length) {
+  console.log('\nFAILED:');
+  for (const f of fails) console.log('  - ' + f);
+  process.exit(1);
+}
+console.log('\nall render assertions passed');
 JS
 
 node "$TMP/measure.mjs" "$BASE" "${POST_PATH:-}"
