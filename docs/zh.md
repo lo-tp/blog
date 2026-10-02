@@ -104,7 +104,7 @@ site's own:
 | --- | --- |
 | `layouts/_default/baseof.html` | the shell: pre-paint edition script, header, `<main class="sheet page">`, colophon |
 | `layouts/partials/head.html` | requests **one** stylesheet, `assets/custom.css`, concatenated to `main.css` and fingerprinted |
-| `layouts/partials/header.html` | the header: the masthead band — masthead or part title, then the profile links → language switch → dark-mode dial — sticky on every page, then the script that publishes its height and wires the dial |
+| `layouts/partials/header.html` | the header: the masthead band — masthead or part title, then the profile links → language switch → dark-mode dial — sticky on every page, then the script that publishes its height and wires the dial. **It prints the page's only `<h1>`, including on a record** (the edition's name plus a `Record` part label); `single.html` prints the record's title as a `<h1 class="record__title">`, so a record page carries two level-1 headings — deliberate under the one-heading-per-page rule, and worth knowing before adding a third |
 | `layouts/partials/edition-controls.html` | the reader's two edition controls, labelled on the title page and plain on inner pages |
 | `layouts/_default/list.html`, `layouts/partials/{records,ledger,record-row,index-rail}.html` | the title page, the contents ledger, the technique index, pagination |
 | `layouts/_default/single.html` | a record: meta rule, body, edition switch, earlier/later |

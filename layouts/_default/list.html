@@ -26,8 +26,9 @@
 </div>
 
 {{- else if eq .Kind "taxonomy" -}}
+{{- /* The index on its own. The header band above already names it: this block
+  prints no heading and opens no rule, because a page is headed once. */ -}}
 <section class="contents">
-  <h2 class="contents__title">{{ i18n "chrome_techniques" }}</h2>
   <ul class="terms">
     {{- range $entry := $index -}}
     <li>

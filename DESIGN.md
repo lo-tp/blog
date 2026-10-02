@@ -197,7 +197,7 @@ for prose, the sans for headings.
 - **Ledger Title** (700, 1.3rem, lh 1.4): a row's title in the contents ledger.
 - **Body** (400, 17px, lh 1.7): article prose, 57ch measure (≈75 characters per line).
 - **Label** (600, 0.72rem, tracked 0.16em, capitals): the edition's label voice — `Contents`,
-  `Index of techniques`, `Earlier record`, named states. Short strings only.
+  `All techniques`, `Earlier record`, named states. Short strings only.
 - **Meta / Folio** (500–600, 0.75–0.8rem, tracked 0.05em, tabular figures): dates, counts,
   language tags, pagination position.
 

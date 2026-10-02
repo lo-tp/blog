@@ -21,9 +21,6 @@
 - id: chrome_skip
   translation: 'Skip to contents'
 
-- id: chrome_techniques
-  translation: 'Index of techniques'
-
 - id: chrome_all_techniques
   translation: 'All techniques'
 

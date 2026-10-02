@@ -20,9 +20,6 @@
 - id: chrome_skip
   translation: '跳到目录'
 
-- id: chrome_techniques
-  translation: '技法索引'
-
 - id: chrome_all_techniques
   translation: '全部技法'
 
