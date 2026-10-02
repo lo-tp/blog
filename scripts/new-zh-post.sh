@@ -4,10 +4,10 @@
 #
 #   scripts/new-zh-post.sh <slug>          # slug = content/posts/<slug>.md, without .md
 #
-# It copies the English frontmatter, adds the `translationKey` that pairs the two files,
-# marks the new file `draft: true`, and pastes the English body inside an HTML comment so
-# you have something to translate against. It writes no Chinese itself: the translation is
-# yours. See docs/zh.md.
+# It ensures the pairing `translationKey` exists on BOTH files, copies the English
+# frontmatter into the new one, marks it `draft: true`, and pastes the English body inside an
+# HTML comment so you have something to translate against. It writes no Chinese itself: the
+# translation is yours. See docs/zh.md.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -48,19 +48,46 @@ if [ -z "$fm_end" ]; then
   exit 1
 fi
 
+fm=$(mktemp)
 tmp=$(mktemp)
-trap 'rm -f "$tmp"' EXIT
+trap 'rm -f "$tmp" "$fm"' EXIT
 
-# Front matter, with translationKey added when the original does not declare one.
-if head -n "$fm_end" "$src" | grep -q '^translationKey:'; then
-  sed -n "1,$((fm_end - 1))p" "$src" > "$tmp"
+# --- translationKey on the English original -------------------------------------------
+# Pairing is read from the key, and Hugo resolves .Translations from BOTH sides. A key on
+# the .zh.md alone still renders the original's page, but the original never links back: no
+# `中文`-side twin, no hreflang="en", and i18n-status.sh's `unpaired` counter cannot see it,
+# because that check looks for a key on the translation only. So the key is ensured here.
+# The value used is whatever the original already declares; nothing else in the original is
+# touched (the file is rewritten only when the key is genuinely absent).
+if head -n "$fm_end" "$src" | grep -q '^translationKey:[[:space:]]*[^[:space:]]'; then
+  key=$(sed -n "s/^translationKey:[[:space:]]*//p" "$src" | head -n 1 | sed 's/[[:space:]]*$//')
+  key=${key#\"}; key=${key#\'}; key=${key%\"}; key=${key%\'}
 else
+  key="$slug"
+  # The key goes INSIDE the front matter: before the closing `---` at line fm_end. Appending
+  # it after that line leaves it as body text, which Hugo ignores and which then shows up in
+  # the scaffold's 原文 comment instead of in the front matter.
   {
-    head -n 1 "$src"
-    echo "translationKey: $slug"
-    sed -n "2,$((fm_end - 1))p" "$src"
-  } > "$tmp"
+    sed -n "1,$((fm_end - 1))p" "$src"
+    printf 'translationKey: %s\n' "$key"
+    sed -n "${fm_end},\$p" "$src"
+  } > "$fm"
+  # Preserve the original's mtime: a commit date for the original later than the translation
+  # is exactly what i18n-status.sh reports as drift, and a tool that scaffolds a translation
+  # should not manufacture it. `touch -t` takes [[CC]YY]MMDDHHMM[.SS], not an epoch, so the
+  # epoch from stat is converted with date -r first.
+  mepoch=$(stat -f %m "$src" 2>/dev/null || stat -c %Y "$src")
+  mv "$fm" "$src"
+  touch -t "$(date -r "$mepoch" '+%Y%m%d%H%M.%S')" "$src"
+  echo "added translationKey: $key to $src (pairing needs it on both files)"
+  # The front matter is one line longer now, so every later line-based slice must shift.
+  fm_end=$((fm_end + 1))
 fi
+
+# --- front matter of the new file, carrying that key ---------------------------------
+# After the block above, $src always declares the key, so this is a straight copy of its
+# front matter (line 1 is the opening `---`, line fm_end is the closing one).
+sed -n "1,$((fm_end - 1))p" "$src" > "$tmp"
 
 # Draft unless the original declares a draft value: an untranslated page should not go live.
 if ! grep -q '^draft:' "$tmp"; then
@@ -84,5 +111,5 @@ echo "next steps:"
 echo "  1. translate title and description"
 echo "  2. replace tags with Chinese ones (docs/zh.md has the agreed tag list)"
 echo "  3. translate the body, then delete the 原文 comment block"
-echo "  4. keep unchanged: the filename, translationKey, date, images paths"
+echo "  4. keep unchanged: the filename, translationKey ($key), date, images paths"
 echo "  5. when it reads like your own writing, remove the draft: true line"

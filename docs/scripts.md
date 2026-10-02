@@ -8,7 +8,7 @@ scripts is in [zh.md](./zh.md).
 | Script | What it does | Writes to the repo? | Exit codes |
 | --- | --- | --- | --- |
 | `scripts/new-zh-post.sh` | create the `<slug>.zh.md` file to translate into | yes, one new file | 0 created · 1 error · 2 bad usage |
-| `scripts/i18n-status.sh` | report untranslated / orphan / unpaired / drifted | no | always 0 |
+| `scripts/i18n-status.sh` | report untranslated / orphan / unpaired / one-sided key / drifted | no | always 0 |
 | `scripts/i18n-smoke.sh` | assert the Chinese wiring still works | no (builds into `.i18n-smoke.tmp`, gitignored) | 0 all pass · 1 something failed |
 
 All three work from any directory: they `cd` to the repo root first.
@@ -48,6 +48,15 @@ draft: true                                   # added: nothing goes live untrans
 -->
 ```
 
+If the English original has no `translationKey`, the script adds one to **it too**, on its own
+line inside the front matter, and prints `added translationKey: <key> to …`. That write is the
+one exception to "it will not touch the English original" (see below), and it is the fix for a
+failure that otherwise looks like a healthy build: Hugo resolves a page's `.Translations` from
+both sides, so a key on the `.zh.md` alone still builds two pages and still shows `中文` on the
+English one — but the Chinese page renders **no** switch back and no `hreflang="en"`. Your own
+key, quoted or not, is always kept; it is copied into the `.zh.md` verbatim and no second key
+is written.
+
 Then it prints the next steps: translate `title` and `description`, swap `tags` for Chinese
 ones, translate the body and delete the 原文 comment, keep the filename / `translationKey` /
 `date` / `images` paths unchanged, and remove `draft: true` when the Chinese reads like your
@@ -57,7 +66,13 @@ own writing.
 
 - **Refuses to overwrite.** If `<slug>.zh.md` exists it stops instead of clobbering your work.
 - **Needs front matter.** A post with no opening `---` block is an error, not a silent guess.
-- **`translationKey` is only added if absent.** If you already set your own key it is kept.
+- **`translationKey` is ensured on both files, and only added if absent.** If you already set
+  your own key it is kept, in both files, and the English original is not rewritten at all —
+  not a byte, not its mtime.
+- **When it does write the original, it preserves that original's mtime.** A commit date for
+  the original later than the translation is exactly what `i18n-status.sh` reports as **drift**;
+  a tool whose job is to *start* a translation must not manufacture drift at the moment of
+  scaffolding.
 - **`draft: true` is only added if you said nothing about draft.** If the original declares
   `draft: false`, that is respected.
 - The English body is pasted inside an HTML comment, with any `-->` escaped to `--&gt;` so
@@ -65,7 +80,9 @@ own writing.
 
 ### It will not
 
-write Chinese, pick tags, rename files, touch the English original, or publish anything.
+write Chinese, pick tags, rename files, or publish anything. It edits the English original in
+exactly one way: inserting a missing `translationKey` inside its front matter. Nothing else in
+that file moves.
 
 ---
 
@@ -85,6 +102,7 @@ chinese translations: 1
 untranslated:         15
 orphans:              0
 unpaired:             0
+one-sided keys:       0
 drifted:              0
 
 Untranslated originals (no .zh.md):
@@ -100,6 +118,12 @@ What each line means:
   is wrong or the original was deleted.
 - **unpaired** — a `.zh.md` with no `translationKey`. The page builds fine, but the language
   switch and `hreflang` cannot find its twin. Fix by adding `translationKey: <slug>`.
+- **one-sided keys** — the mirror case, which `unpaired` cannot see: the `.zh.md` has the key,
+  the English original does not. Hugo resolves `.Translations` from both sides, so the build is
+  clean and the English page even shows `中文` — but the Chinese page renders no switch back and
+  no `hreflang="en"`. This is the most common way to half-pair a post, because scaffolding with
+  `new-zh-post.sh` used to add the key to the translation only. Fix by adding the same key to
+  the original; the script now does it for you.
 - **drifted** — the English original was committed *after* the translation. Expected over
   time; the point is that you see it rather than assume the Chinese is current.
 - **drift unknown** — the pair isn't committed yet, so there are no commit timestamps to
@@ -166,6 +190,7 @@ FAIL  test fixture pair exists (content/posts/i18n-smoke-test.md + .zh.md) — r
 | `chinese pages declare lang="zh"`, dates not Chinese | `[languages.zh] locale` missing or renamed in `hugo.toml` |
 | `chinese tag links stay under /zh/` | the vendored `layouts/_default/single.html` lost its `absLangURL`, or the theme copy overwrote it |
 | `a paired … post shows the language switch` | `translationKey` gone from the fixture, or the header no longer calls the partial |
+| `every real pair renders the switch in BOTH directions` | `translationKey` missing from the English original of a real post (the fixture cannot catch this: it has its key on both files) |
 | `header order: …` | the switch or the dark-mode toggle moved, or the header `<script>` moved back above the nav |
 | `hugo.toml uses no deprecated keys` | a `languageCode` / `languageName` came back in the config |
 

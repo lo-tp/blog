@@ -95,6 +95,31 @@ else
   pass "an untranslated post shows no language switch (no untranslated post to check)"
 fi
 
+# Pairing on every real pair, not just the fixture. The fixture has its key on both files by
+# construction, so it can never catch the one-sided case: a key on the .zh.md only. That build
+# is clean, the English page shows 中文, and the Chinese page shows nothing — no switch back, no
+# hreflang="en". The fixture would pass while a real post was broken.
+pairs_checked=0
+pairs_ok=0
+for src in "$posts_dir"/*.md; do
+  case "$src" in *.zh.md) continue ;; esac
+  dst="${src%.md}.zh.md"
+  [ -f "$dst" ] || continue
+  slug=$(basename "${src%.md}" | tr 'A-Z' 'a-z')
+  en_page="$out/posts/$slug/index.html"; zh_page="$out/zh/posts/$slug/index.html"
+  pairs_checked=$((pairs_checked + 1))
+  if grep -q 'data-lang-switch' "$en_page" 2>/dev/null && grep -q 'data-lang-switch' "$zh_page" 2>/dev/null; then
+    pairs_ok=$((pairs_ok + 1))
+  else
+    fail "every real pair renders the switch in BOTH directions ($slug: en=$(grep -qc 'data-lang-switch' "$en_page" 2>/dev/null || echo 0) zh=$(grep -qc 'data-lang-switch' "$zh_page" 2>/dev/null || echo 0)). Check translationKey on BOTH files; scripts/new-zh-post.sh adds it to the original when missing."
+  fi
+done
+if [ "$pairs_checked" -eq 0 ]; then
+  pass "every real pair renders the switch in BOTH directions (no real pairs to check)"
+elif [ "$pairs_ok" -eq "$pairs_checked" ]; then
+  pass "every real pair renders the switch in BOTH directions ($pairs_checked pair(s))"
+fi
+
 if grep -rq -- '--nav-gap' "$out"/main.min.*.css 2>/dev/null; then
   pass "the header spacing rule ships in the built css (assets/custom.css is in the pipeline)"
 else

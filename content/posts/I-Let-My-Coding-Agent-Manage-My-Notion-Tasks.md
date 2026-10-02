@@ -2,6 +2,7 @@
 title: "I Let My Coding Agent Manage My Notion Tasks. Here's What I Learned."
 description: "I gave my coding agent a CLI to manage my Notion tasks. The lesson: scripts for the deterministic parts, prompts for the judgment calls."
 date: 2026-09-30T00:00:00
+translationKey: I-Let-My-Coding-Agent-Manage-My-Notion-Tasks
 images:
   - "/images/notion-agent-cover.jpg"
 tags: ["Coding Agent", "Notion", "Skill", "LLM"]

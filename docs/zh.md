@@ -17,9 +17,10 @@ scripts/new-zh-post.sh I-Let-My-Coding-Agent-Manage-My-Notion-Tasks
 ./hugo server          # http://localhost:1313/zh/
 ```
 
-The script copies the English front matter, adds the `translationKey` that pairs the two
-files, sets `draft: true`, and pastes the English body inside a `<!-- 原文 … -->` comment
-to translate against. Then:
+The script copies the English front matter, ensures the `translationKey` that pairs the two
+files exists **on both of them** (adding it to the English original when it is missing — pairing
+is read from both sides), sets `draft: true`, and pastes the English body inside a `<!-- 原文 … -->`
+comment to translate against. Then:
 
 1. Translate `title` and `description`.
 2. Replace `tags` with Chinese tags (see the list below).
@@ -28,9 +29,11 @@ to translate against. Then:
 
 Keep unchanged: the filename (`<same-slug>.zh.md`), `translationKey`, `date`, `images` paths.
 
-**Without a `translationKey` the two files are not a pair.** Hugo will happily build both,
-but neither page links to the other and no `hreflang` is emitted. This is the single easiest
-way to get it wrong.
+**Without a `translationKey` on both files the two files are not a pair.** Hugo will happily
+build both, and a key on the translation alone will even make the English page show `中文` — but
+the Chinese page renders no switch back and no `hreflang="en"`, because Hugo resolves
+`.Translations` from both sides. `scripts/i18n-status.sh` reports that case as **one-sided keys**,
+and `scripts/i18n-smoke.sh` fails the deploy on it. This is the single easiest way to get it wrong.
 
 ## What Hugo does for free
 
@@ -83,9 +86,10 @@ scripts/i18n-status.sh
 Informational, always exits 0. Full usage and how drift is measured:
 [scripts.md → i18n-status.sh](./scripts.md#scriptsi18n-statussh--see-what-is-left-to-do).
 Reports originals with no Chinese counterpart, orphan
-translations, translations missing a `translationKey`, and **drift** — a translation whose
-English original was committed later than the translation itself. Drift is expected; the
-point is that it is visible rather than assumed away.
+translations, translations missing a `translationKey`, **one-sided keys** (the key is on the
+translation but not on the original, so the switch renders in one direction only), and **drift** —
+a translation whose English original was committed later than the translation itself. Drift is
+expected; the point is that it is visible rather than assumed away.
 
 ## The smoke check
 
@@ -96,8 +100,10 @@ HUGO_BIN=./hugo bash scripts/i18n-smoke.sh              # as CI runs it
 
 Builds into a throwaway `.i18n-smoke.tmp` directory with drafts included and asserts: both
 languages build, Chinese pages declare `lang="zh"`, the Chinese feed exists, a paired post
-links to its twin in both directions, the header renders social icons → language switch →
-dark-mode toggle with the script after them, an unpaired post
+links to its twin in both directions, **every real pair in `content/posts/` renders the switch
+in both directions** (the fixture pair has its key on both files by construction, so on its own
+it could pass while a real post was half-paired), the header renders social icons → language
+switch → dark-mode toggle with the script after them, an unpaired post
 shows no switch, Chinese tag links
 stay under `/zh/`, dates render in Chinese, and `hugo.toml` uses no deprecated keys.
 

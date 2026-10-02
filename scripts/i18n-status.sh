@@ -9,6 +9,7 @@
 #   untranslated  — English posts with no .zh.md counterpart (a legal, permanent state)
 #   orphans       — .zh.md files with no English original
 #   unpaired      — .zh.md files missing `translationKey` (the switch cannot find them)
+#   one-sided     — key on the .zh.md but not on the original (switch renders one way only)
 #   drifted       — translations whose English original was committed later than they were
 set -euo pipefail
 
@@ -35,6 +36,7 @@ translations=0
 untranslated=""
 orphans=""
 unpaired=""
+one_sided=""
 drifted=""
 drift_unknown=""
 
@@ -61,6 +63,12 @@ for dst in "$posts_dir"/*.zh.md; do
 
   if ! sed -n '2,/^---[[:space:]]*$/p' "$dst" | grep -q '^translationKey:'; then
     unpaired="$unpaired  - ${dst#$posts_dir/}  (no translationKey)\n"
+  elif ! sed -n '2,/^---[[:space:]]*$/p' "$src" | grep -q '^translationKey:'; then
+    # The reverse case, which `unpaired` cannot see and which builds with no visible error:
+    # the translation declares a key, the original does not. Hugo resolves .Translations from
+    # both sides, so the English page shows 中文 and the Chinese page shows nothing — no switch
+    # back, no hreflang="en". new-zh-post.sh now ensures the key on both files.
+    one_sided="$one_sided  - ${src#$posts_dir/}  <-> ${dst#$posts_dir/}  (key on the translation only)\n"
   fi
 
   src_t=$(commit_time "$src")
@@ -87,14 +95,16 @@ printf 'chinese translations: %s\n' "$translations"
 printf 'untranslated:         %s\n' "$(count_items "$untranslated")"
 printf 'orphans:              %s\n' "$(count_items "$orphans")"
 printf 'unpaired:             %s\n' "$(count_items "$unpaired")"
+printf 'one-sided keys:       %s\n' "$(count_items "$one_sided")"
 printf 'drifted:              %s\n' "$(count_items "$drifted")"
 printf '\n'
 
 if [ -n "$untranslated" ]; then printf 'Untranslated originals (no .zh.md):\n%b\n' "$untranslated"; fi
 if [ -n "$orphans" ]; then printf 'Orphan translations (no English original):\n%b\n' "$orphans"; fi
 if [ -n "$unpaired" ]; then printf 'Missing translationKey (language switch cannot pair them):\n%b\n' "$unpaired"; fi
+if [ -n "$one_sided" ]; then printf 'One-sided translationKey (switch renders one way only; add the key to the English original):\n%b\n' "$one_sided"; fi
 if [ -n "$drifted" ]; then printf 'Drifted (original changed after the translation):\n%b\n' "$drifted"; fi
 if [ -n "$drift_unknown" ]; then printf 'Drift unknown (new files, not committed yet):\n%b\n' "$drift_unknown"; fi
-if [ -z "$untranslated$orphans$unpaired$drifted$drift_unknown" ]; then
+if [ -z "$untranslated$orphans$unpaired$one_sided$drifted$drift_unknown" ]; then
   printf 'Nothing to report.\n'
 fi
