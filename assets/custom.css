@@ -330,18 +330,19 @@ hr {
      neighbouring control. */
   font-size: 0;
   overflow: hidden;
-  background: var(--url) center / 18px 18px no-repeat;
-  filter: grayscale(1) brightness(0.55);
-  transition: filter var(--step) var(--ease);
-}
-
-html.dark .social a {
-  filter: grayscale(1) brightness(1.6);
+  /* The theme's glyphs are filled black, and a filter cannot make black
+     lighter — printed as an image they vanish on the night edition. Use the
+     glyph as a mask instead and paint it from the ink tokens: one weight in
+     both editions, dimmed to settled ink, full ink on hover. */
+  background: var(--ink-2);
+  -webkit-mask: var(--url) center / 18px 18px no-repeat;
+  mask: var(--url) center / 18px 18px no-repeat;
+  transition: background var(--step) var(--ease);
 }
 
 .social a:hover,
 .social a:focus-visible {
-  filter: grayscale(0) brightness(1);
+  background: var(--ink);
 }
 
 .lang-switch {
@@ -433,6 +434,10 @@ html.dark .btn-dark .shade {
   position: sticky;
   top: 0;
   z-index: 30;
+  /* `--paper` is redefined by the edition (html.dark below), so this one value
+     prints the band on the sheet's own ground in both editions — opaque in
+     each, because a sticky band content scrolls under is a band that carries
+     the text of the record it is covering. */
   background: var(--paper);
 }
 
@@ -441,10 +446,6 @@ html.dark .btn-dark .shade {
    offset and every #y#### scroll margin are computed from it. */
 .masthead-band {
   min-height: var(--header-h);
-}
-
-html.dark .masthead-band {
-  background: var(--night-paper);
 }
 
 .frontmatter {
