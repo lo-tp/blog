@@ -111,6 +111,14 @@
      at 17px: wider than the 30–40 line Chinese is usually set at, which is what
      the two editions being the same width costs. */
   --measure-read: 610px;
+  /* Language switches: a fixed box, the same width in both editions. The two
+     labels are different lengths — `中文` is 28px of text, `English` 48px in the
+     display face at this size — and a control that grows to its label moved the
+     whole header row sideways between the English page and its Chinese twin, and
+     made the edition switch at the end of a record shift too. The width is set
+     from the longer label plus room, and the label is centred in it. */
+  --measure-switch: 4.25rem; /* 68px: `English` at 0.78rem */
+  --measure-switch-lg: 5.25rem; /* 84px: `English` at the record's 0.95rem */
   /* --header-h is the FLOOR the header band must clear, not its height: the
      masthead band — masthead voice at Part Title scale plus its control row —
      is taller than 64px on desktop. .masthead-band reports its measured height
@@ -349,6 +357,8 @@ html.dark .social a {
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   padding: 0.25rem 0.4rem;
+  min-width: var(--measure-switch);
+  text-align: center;
   border: 1px solid var(--rule-2);
   color: var(--nav);
   text-decoration: none;
@@ -1312,6 +1322,8 @@ a.masthead--part {
   font-size: 0.95rem;
   letter-spacing: 0.14em;
   padding: 0.25rem 0.45rem;
+  min-width: var(--measure-switch-lg);
+  text-align: center;
   border: 1px solid var(--rule-2);
   color: var(--nav);
   white-space: nowrap;
