@@ -257,10 +257,9 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
 
 ### Header (the masthead band)
 - **Style:** full sheet width, 2px ink rule below, sticky at top 0 on every page, one band on every
-  page: masthead voice at Part Title scale everywhere — the title page's name plus its part label,
-  the part title on a section or technique page, the edition's name plus a `Record` part label on a
-  record page. Its height is its own content. Below 1000px it stacks into one column, control order
-  preserved.
+  page: masthead voice at Part Title scale everywhere — the edition's name with a `Blog` part label
+  on the title page and on a record, the part title on a section or technique page. Its height is
+  its own content. Below 1000px it stacks into one column, control order preserved.
 - **Content:** the edition's name or the part title at the near edge; profile links → language
   switch → dark-mode dial at the far edge, unlabelled on every page — each control names itself in
   its accessible name instead.

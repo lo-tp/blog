@@ -9,13 +9,13 @@
 - id: chrome_contents
   translation: 'Contents'
 
-# The header band's part label. Given a count it resolves the way
-# chrome_records_unit does: `Record` for one record, `Records` for any other
-# number — which is only ever asked on the title page.
-- id: chrome_record
-  translation:
-    one: 'Record'
-    other: 'Records'
+# The header band's part label, beside the edition's name on the title page and
+# on a record. It names the blog, never the individual record — the record's own
+# title is printed by single.html, and `Record` belonged to the header that used
+# to look different from the title page's. chrome_records_unit is a separate
+# string: the ledger's year counts.
+- id: chrome_blog
+  translation: 'Blog'
 
 - id: chrome_index
   translation: 'Index'

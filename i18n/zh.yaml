@@ -8,12 +8,11 @@
 - id: chrome_contents
   translation: '目录'
 
-# 页眉带的分区标签。传入数量时按 chrome_records_unit 的方式解析：
-# 中文不分单复数，两种数量都是“记录”。只有标题页会问这个问题。
-- id: chrome_record
-  translation:
-    one: '记录'
-    other: '记录'
+# 页眉带的分区标签，跟在版本名后面，标题页与记录页都有。它说的是博客本身，
+# 不是这一条记录——记录自己的标题由 single.html 打印。chrome_records_unit 是另一条
+# 文案，用于目录里的年份计数。
+- id: chrome_blog
+  translation: '博客'
 
 - id: chrome_index
   translation: '索引'

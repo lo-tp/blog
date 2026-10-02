@@ -8,14 +8,13 @@
   day/night edition.
 
   One band on every page. The title page wears the same header a record wears:
-  the edition's name at the Part Title scale with the part of the edition named
-  beside it. What differs is only *which* part is named, because the header is
-  the page's own title line:
-    * title page      → the edition's name, with `Records` beside it
-                        (the plural resolves through i18n from the record count)
+  the edition's name at the Part Title scale with `Blog` beside it. What differs
+  is only how the name behaves, because the header is the page's own title line:
+    * title page      → the edition's name plus `Blog`, as the page's `<h1>`,
+                        the name linking to itself
     * section / tag   → the index name, in the Part Title setting
-    * a record        → the edition's name, so the record stays reachable from
-                        anywhere; the record's own title is printed by
+    * a record        → the edition's name plus `Blog`, as a link back to the
+                        title page; the record's own title is printed by
                         single.html as the page's H1.
 
   The contract of this row is its order — profile links -> language switch ->
@@ -33,13 +32,12 @@
   <div class="frontmatter frontmatter--part">
     {{- if .IsHome -}}
     {{- /* The title page in the same voice as every other page's header: the
-      edition's name, then the part of the edition it is. The count is the
-      edition's own published record count from records.html, so the label can
-      only ever say `Record` when there is one record. The h1 stays here
-      because this band is the title page's heading. */ -}}
+      edition's name, then `Blog` beside it. The h1 stays here because this band
+      is the title page's heading; on a record the same row is a plain link and
+      the record's title is the page's h1. */ -}}
     <h1 class="masthead masthead--part">
       <a class="masthead__name" href="{{- "/" | absLangURL -}}">{{- site.Params.name | default site.Title -}}</a>
-      <span class="masthead__part">{{- i18n "chrome_record" (len (.Scratch.Get "records")) -}}</span>
+      <span class="masthead__part">{{- i18n "chrome_blog" -}}</span>
     </h1>
     {{- else if $isPart -}}
     {{- /* Hugo's term title is the lowercased key, so the header names the
@@ -60,7 +58,7 @@
     {{- else -}}
     <a class="masthead masthead--part" href="{{- "/" | absLangURL -}}">
       <span class="masthead__name">{{- site.Params.name | default site.Title -}}</span>
-      <span class="masthead__part">{{- i18n "chrome_record" 1 -}}</span>
+      <span class="masthead__part">{{- i18n "chrome_blog" -}}</span>
     </a>
     {{- end -}}
 
