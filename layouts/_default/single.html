@@ -44,23 +44,21 @@
     {{- .Content -}}
   </section>
 
+  {{- /* One edition at a time. A record's twin is not printed beside this one:
+  the page carries only the language being read, and the other edition is one
+  named switch away. The twin's title is never shown here — reaching it means
+  switching, which is what ADR 0001 chose explicitly. */ -}}
   {{- with $twin -}}
-  <section class="pair">
-    <div class="pair__half pair__half--here">
-      <span class="label">{{- i18n "chrome_here" -}}</span>
-      <span class="pair__current" aria-current="true">
-        {{ or $.Language.Label $.Language.Lang }} — {{ $.Title }}
-      </span>
-    </div>
-    <span class="pair__gutter" aria-hidden="true"></span>
-    <div class="pair__half">
-      <span class="label">{{- i18n "chrome_pair" -}}</span>
-      <a
-        hreflang="{{- .Language.Locale -}}"
-        href="{{- .RelPermalink -}}"
-        >{{ or .Language.Label .Language.Lang }} — {{ .Title }}</a>
-    </div>
-  </section>
+  <nav class="edition-switch" aria-label="{{- i18n "chrome_edition" -}}">
+    <a
+      class="edition-switch__link"
+      hreflang="{{- .Language.Locale -}}"
+      href="{{- .RelPermalink -}}"
+    >
+      <span class="label">{{- i18n "chrome_record_switch" -}}</span>
+      <span class="edition-switch__language">{{- or .Language.Label .Language.Lang -}}</span>
+    </a>
+  </nav>
   {{- end -}}
 
   {{- /* Earlier and later, resolved from the edition's own record list. The

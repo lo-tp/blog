@@ -15,56 +15,10 @@
 {{- $index := $techs | append $singles -}}
 
 {{- if .IsHome -}}
-<header class="frontmatter">
-  <h1 class="masthead">
-    <a href="{{ "/" | absLangURL }}">{{ site.Params.name | default site.Title }}</a>
-  </h1>
-  <div class="imprint">
-    {{- /* Masthead controls: the profile glyphs plus the reader's own two edition
-      controls — the language of this record and the day/night edition — each named
-      in the apparatus voice, in the edition's own head face. The same controls the
-      running head carries, printed at the title page. */ -}}
-    <nav class="frontmatter-controls" aria-label="{{- i18n "chrome_profile" -}} · {{- i18n "chrome_edition" -}}">
-    {{- $services := slice -}}
-    {{- if site.Params.github -}}{{- $services = $services | append (dict "id" "github" "label" "GitHub" "href" (print "https://github.com/" site.Params.github)) -}}{{- end -}}
-    {{- if site.Params.twitter -}}{{- $services = $services | append (dict "id" "twitter" "label" "X" "href" (print "https://x.com/" site.Params.twitter)) -}}{{- end -}}
-    {{- if site.Params.linkedin -}}{{- $services = $services | append (dict "id" "linkedin" "label" "LinkedIn" "href" (print "https://www.linkedin.com/in/" site.Params.linkedin)) -}}{{- end -}}
-    {{- with $services -}}
-    <nav class="social" aria-label="{{- i18n "chrome_profile" -}}">
-      {{- range . -}}
-      <a
-        data-social="{{- .id -}}"
-        style="--url: url({{- printf "%s.svg" .id | absURL -}})"
-        href="{{- .href -}}"
-        target="_blank"
-        rel="me noopener"
-      >{{- .label -}}</a>
-      {{- end -}}
-    </nav>
-    {{- end -}}
-
-    <span class="edition-control">
-      <span class="edition-control__label">{{- i18n "chrome_edition" -}}</span>
-      {{- partial "lang-switch.html" (dict "page" . "navClass" "lang-switch" "linkClass" "") -}}
-    </span>
-
-    <span class="edition-control">
-      <span class="edition-control__label">{{- i18n "chrome_edition_night" -}}</span>
-      <span
-        class="btn-dark"
-        role="button"
-        tabindex="0"
-        aria-label="{{- i18n "chrome_theme_toggle" -}}"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle class="dial" cx="12" cy="12" r="8.5" />
-          <path class="shade" d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
-        </svg>
-      </span>
-    </span>
-    </nav>
-  </div>
-</header>
+{{- /* The header — the masthead and its imprint row with the profile links and
+  the reader's two edition controls — is printed by layouts/partials/header.html,
+  which the shell renders on every page. The title page is that band's home
+  ground; nothing here repeats it. */ -}}
 
 <div class="spread">
   {{- partial "index-rail.html" (dict "page" .) -}}
@@ -72,13 +26,6 @@
 </div>
 
 {{- else if eq .Kind "taxonomy" -}}
-<header class="frontmatter frontmatter--part">
-  <h1 class="masthead masthead--part">{{ i18n "chrome_index" }}</h1>
-  <div class="imprint">
-    <p>{{ i18n "chrome_all_techniques" }} · {{ len $index }}</p>
-  </div>
-</header>
-
 <section class="contents">
   <h2 class="contents__title">{{ i18n "chrome_techniques" }}</h2>
   <ul class="terms">
@@ -108,13 +55,6 @@
 {{- end -}}
 {{- end -}}
 {{- $pages := where .Pages "Draft" "eq" false -}}
-
-<header class="frontmatter frontmatter--part">
-  <h1 class="masthead masthead--part">{{ $label }}</h1>
-  <div class="imprint">
-    <p>{{ i18n "chrome_index" }} · {{ len $pages }}{{ i18n "chrome_records_unit" (len $pages) }}</p>
-  </div>
-</header>
 
 <div class="spread">
   {{- partial "index-rail.html" (dict "page" . "current" $currentKey) -}}

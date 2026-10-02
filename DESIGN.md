@@ -119,10 +119,11 @@ components:
 **Creative North Star: "Facing Pages"**
 
 The site is typeset as a bilingual printed edition. A page is paper, not a screen full of
-surfaces: one ground, one ink, hairline rules instead of boxes, a running head and a colophon
-instead of a nav bar and a footer widget. The organising idea is the facing pair — the same
-record printed in two languages, joined by a rule under one date — and everything else on the
-site is apparatus in service of that: a contents ledger, a technique index, a year spine, an
+surfaces: one ground, one ink, hairline rules instead of boxes, a masthead header and a colophon
+instead of a nav bar and a footer widget. The organising idea is the edition
+switch — a record exists in two languages, and the site shows one of them at a time: the other
+edition is a named control, never a second column of the same text printed beside it. Everything
+else on the site is apparatus in service of that: a contents ledger, a technique index, a year spine, an
 author plate, page turns named by title.
 
 Density is editorial, not dashboard-y. The title page puts the index plan beside the contents
@@ -139,7 +140,7 @@ edition, tag links resolved inside the reader's own language. **Key Characterist
 - The display face sets chrome only — never content.
 - One reserved colour (brick) for the single thing the reader is on.
 - States are named in words, never colour alone.
-- Apparatus carries the chronology: running heads, folio dates, a year spine.
+- Apparatus carries the chronology: the header band, folio dates, a year spine.
 
 ## Colors
 
@@ -152,8 +153,8 @@ the night edition dims its accents with its paper so the contrast relationship i
 
 ### Secondary
 - **Brick** (#b03f26): the reserved ink. Only the record or technique you are currently on — the
-  date in a record's meta rule, the current entry in the technique index, the "you are reading"
-  half of a facing pair, a named state such as `Untranslated post`. Never used for decoration,
+  date in a record's meta rule, the current entry in the technique index, a paired row's language
+  mark, a named state such as `Untranslated post`. Never used for decoration,
   never two things on one screen. Night: **Night Brick** (#e08166).
 
 ### Neutral
@@ -209,24 +210,28 @@ Anything that reads as a sentence is set in text, sentence case.
 ## Layout
 
 A single **sheet**: `max-width: 1220px`, centred, with `clamp(1rem, 3vw, 2rem)` side padding.
-On the sheet: a **running head** (min-height 64px, hairline below, controls right-aligned in the
-fixed order profile links → language switch → dark-mode dial), the page content, then the
-**colophon**. No template from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
+On the sheet: a **header** — the masthead band itself, sticky at the top of the sheet on every
+page (masthead or part title at the near edge, controls right-aligned in the fixed order profile
+links → language switch → dark-mode dial, 2px rule below) — then the page content, then the
+**colophon**. There is no separate running head: the title page's masthead row *is* the header.
+`--header-h: 64px` is the floor the band must clear, never its height; the band publishes its
+measured height as `--band-h` and everything that sticks below it offsets from that. No template
+from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
 
 - **Title page and technique pages** use a two-column **spread**: a 264px **index rail** on the
   left (techniques counted, then the year spine, then the author plate), sticky from 1000px up;
   the **contents ledger** on the right, grouped by a **year spine** (`6.2rem` folio column +
-  titles). A paired record widens its row to `6.2rem 1fr 1px 1fr` — two halves, one gutter rule.
+  titles). A paired row keeps one title and a narrow tail column for its language mark.
 - **Record pages** set one text block, `max-width: 57ch`, centred between the sheet margins.
-  The facing pair and the earlier/later pair print inside the same measure.
+  The edition switch and the earlier/later pair print inside the same measure.
 - **Rhythm is one scale.** `--g-1 … --g-5` (0.5 / 1 / 1.5 / 2.5 / 4rem), plus `--head-room:
   2.75rem` above a heading, `--head-room-after: 0.85rem` below it, `--row-gap: 1.9rem` between
   ledger rows, `--block-gap: 2.25rem` between article blocks. More space above a heading than
   below it, everywhere, always.
 - **Responsive:** at 1000px the index plan stops being a column and travels with the ledger as a
-  sticky bar above it; at 720px rows collapse to one column, a paired twin prints directly under
-  its own title, and the running head wraps without losing the control order. No control is ever
-  hidden behind a menu.
+  sticky bar above it; at 720px rows collapse to one column with the language mark falling under
+  its own title, and the header band stacks into one column without losing the control order. No
+  control is ever hidden behind a menu.
 
 ## Elevation & Depth
 
@@ -243,14 +248,14 @@ active, give it a rule and the reserved ink.
 Square corners throughout (`border-radius: 0`); borders are 1px hairlines, section openers are
 2px rules. The only clipping is `clip-path: inset(0)` on the portrait (a printed photo, not a
 circle) and `clip-path: inset(50%)` for visually-hidden text. Geometry is typographic: a `1px`
-gutter column between facing halves, an em-rule under each year marker, a drawn dial for the
-dark-mode control, drawn glyphs from one icon set for the profile links.
+em-rule under each year marker, a drawn dial for the
+dark-mode control, drawn glyphs from one icon set for the profile links on the title page.
 
 ## Components
 
-### Running head
-- **Style:** full sheet width, hairline below, 64px tall on desktop; wraps below 720px, order preserved.
-- **Content:** site identifier (name + part label) at the near edge, controls at the far edge.
+### Header (the masthead band)
+- **Style:** full sheet width, 2px ink rule below, sticky at top 0 on every page. Its height is its own content: masthead scale on the title page, Part Title scale on a section or technique page, Part Title scale with a `Record` part label on a record page. Below 1000px it stacks into one column, control order preserved.
+- **Content:** the masthead or part title at the near edge; profile links → language switch → dark-mode dial at the far edge, labelled on the title page and plain on inner pages.
 
 ### Language switch
 - **Style:** outlined rectangle, no radius, `0.25rem 0.4rem` padding, 1px `--rule-2` border, Technical Blue text, `hreflang` and the destination language named in the accessible name.
@@ -264,12 +269,12 @@ dark-mode control, drawn glyphs from one icon set for the profile links.
 ### Ledger row (contents)
 - **Style:** folio date in the 6.2rem column (tabular figures), title at 1.3rem, tag list beneath in Muted Ink at 0.76rem in the tags' own spelling. 1px bottom rule; `:last-child` has none.
 - **State:** hovering a row turns its title blue; the tag list stays quiet.
-- **Paired row:** adds a 1px gutter rule and a second half — the twin's language named in a label, its title as a link.
+- **Paired row:** `6.2rem 1fr auto`, one title only, plus a small outlined language mark (`ALSO IN` / `另有`) at the row's far edge that links straight to the twin. The twin's title is never printed here; reaching it means switching. An Untranslated row prints no mark.
 
-### Facing pair (signature component)
-- **Where:** the end of a record that exists in both languages.
-- **Style:** two halves, `1fr 1px 1fr`, one reserved-ink "you are reading" label on the current side, the other language named above its title.
-- **The authored interaction:** on hover or keyboard focus of a paired ledger row, the centre rule draws its full length (`scaleY` 0.42 → 1, 120ms, `cubic-bezier(0.2, 0, 0.2, 1)`), the twin label takes the reserved ink, and the twin title takes its underline. Reduced-motion gets the same end states with no movement. This is the only interaction on the ledger.
+### Edition switch (signature component)
+- **Where:** the end of a record that exists in both languages, and the language mark on its ledger row.
+- **Style:** a 2px rule, then one right-aligned control — an apparatus label naming the act (`Read this record in` / `以该语言阅读这条记录`) beside the destination language in an outlined box. Never two columns holding the same record twice.
+- **The authored interaction:** on hover or keyboard focus, a paired row's language mark steps from Muted Ink to the reserved ink and takes its underline (120ms, `cubic-bezier(0.2, 0, 0.2, 1)`); the record's switch box takes the blue border and `--paper-pressed` fill. Reduced-motion gets the same end states with no movement. This is the only interaction on the ledger.
 
 ### Index rail
 - **Style:** sticky 264px column: techniques (counted entries; a technique with one record is set as a plain name in the tail line), the year spine, the author plate (64px portrait, name, bio, profile links).
@@ -292,10 +297,11 @@ dark-mode control, drawn glyphs from one icon set for the profile links.
 ### Do:
 - **Do** change a token in `assets/custom.css` rather than a selector in a template. Every
   measure, colour, rule and motion in the site comes from that one file.
-- **Do** name every state in words: `Untranslated post`, `你正在阅读`, `Page 2 / 5`,
+- **Do** name every state in words: `Untranslated post`, `另有`, `Page 2 / 5`,
   `← 上一页`. Colour is never the only signal.
-- **Do** keep the header contract: profile links → language switch → dark-mode dial, with the
-  script that wires the dial after them, at every width.
+- **Do** keep the header contract: profile links → language switch → dark-mode dial in the header
+  band, with the script that wires the dial after them, at every width, and the band's measured
+  height published as `--band-h` so the sticky index rail and the year anchors sit below it.
 - **Do** resolve tag and feed links with `absLangURL`, so a Chinese reader stays under `/zh/`.
 - **Do** put more space above a heading (`--head-room`) than below it (`--head-room-after`).
 - **Do** keep secondary chrome text above 4.5:1 — `--ink-3` is #5f666c (5.25:1 on paper) for a

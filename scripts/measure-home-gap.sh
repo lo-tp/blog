@@ -12,7 +12,9 @@
 #   - a stylesheet actually loaded, and the self-hosted display face actually loaded;
 #   - the header controls appear in the contract order: profile links → language
 #     switch → dark-mode dial, and none of them overlap;
-#   - the running head is --header-h tall on desktop;
+#   - the header band is sticky, it clears --header-h, it publishes its measured
+#     height as --band-h, and the sticky index rail sits at --band-h + 1rem rather
+#     than overlapping it (this is what --band-h exists for);
 #   - the title page's rhythm: masthead rule → contents → year marker → first row,
 #     and that rows inside one year group are --row-gap apart;
 #   - on a phone the index plan travels with the ledger (it stays sticky and on
@@ -119,11 +121,22 @@ const PROBE = () => {
     return value.includes('rem') ? Math.round(n * 16) : Math.round(n);
   };
 
-  const social = [...document.querySelectorAll('.running-head .social a')].map((a) => a.getBoundingClientRect());
+  const social = [...document.querySelectorAll('.frontmatter-controls .social a')].map((a) => a.getBoundingClientRect());
   const socialBoxes = social.map((b) => ({ x: +b.x.toFixed(0), right: +b.right.toFixed(0), y: +b.y.toFixed(0) }));
   const lang = box('.lang-switch a') || box('.lang-switch');
   const dial = box('.btn-dark');
-  const head = box('.running-head');
+  const head = box('.masthead-band');
+  const band = box('.masthead-band .frontmatter');
+  const sticky = (() => {
+    const e = document.querySelector('.masthead-band');
+    const i = document.querySelector('.index');
+    return {
+      header: e ? getComputedStyle(e).position : null,
+      headerTop: e ? getComputedStyle(e).top : null,
+      index: i ? getComputedStyle(i).position : null,
+      indexTop: i ? getComputedStyle(i).top : null,
+    };
+  })();
   const masthead = box('.masthead');
   const frontmatter = box('.frontmatter');
   const contents = box('.contents');
@@ -143,16 +156,18 @@ const PROBE = () => {
     cssSheetsLoaded: document.styleSheets.length,
     displayFaceLoaded: document.fonts.check('700 16px "Archivo Narrow"'),
     tokens: { headerH: token('--header-h'), rowGap: token('--row-gap'), measure: token('--measure-read') },
-    runningHead: head,
+    headerBand: head,
+    band,
+    sticky,
+    bandVar: getComputedStyle(document.documentElement).getPropertyValue('--band-h').trim(),
     controls: {
       social: socialBoxes.length,
       socialRightMost: socialBoxes.length ? Math.max(...socialBoxes.map((b) => b.right)) : null,
-      socialLabelSpill: socialBoxes.length < social.length ? 'n/a' : [...document.querySelectorAll('.running-head .social a')].filter((a) => a.scrollWidth > a.clientWidth + 1).length,
+      socialLabelSpill: socialBoxes.length < social.length ? 'n/a' : [...document.querySelectorAll('.frontmatter-controls .social a')].filter((a) => a.scrollWidth > a.clientWidth + 1).length,
       lang,
       dial,
       orderIsProfileThenLangThenDial: ascending,
       anyPairOverlaps:
-        overlaps(socialBoxes[0], lang) ||
         overlaps(lang, dial) ||
         (socialBoxes.length > 1 && overlaps(socialBoxes[0], socialBoxes[1])),
     },
@@ -184,18 +199,42 @@ for (const [label, width, height] of homeViewports) {
   page.on('requestfailed', (r) => blocked.push(`${r.url()} ${(r.failure() || {}).errorText}`));
   await page.goto(base + '/', { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
+  // header.html publishes the band's measured height as --band-h on load and on
+  // resize. Wait for that number instead of racing it.
+  await page.waitForFunction(
+    () => {
+      const v = getComputedStyle(document.documentElement).getPropertyValue('--band-h').trim();
+      return v && !/undefined|NaN/.test(v) && parseFloat(v) > 0;
+    },
+    { timeout: 5000 },
+  );
   const r = await page.evaluate(PROBE);
 
   if (r.cssSheetsLoaded === 0) fail(label, 'NO CSS LOADED — is the page referencing a cross-origin baseURL? Serve with a local baseURL override.');
   if (!r.displayFaceLoaded) fail(label, 'the self-hosted display face did not load (static/fonts/ or the @font-face url)');
-  if (r.controls.social === 0) fail(label, 'no profile links in the running head');
+  if (r.controls.social === 0) fail(label, 'no profile links in the header band');
   if (!r.controls.orderIsProfileThenLangThenDial) fail(label, 'header control order broken: must be profile links → language switch → dark-mode dial');
   if (r.controls.anyPairOverlaps) fail(label, 'header controls overlap each other');
   if (r.controls.socialLabelSpill > 0) fail(label, `${r.controls.socialLabelSpill} profile link(s) paint their label over the neighbouring control`);
-  // --header-h is the desktop running head; below 720px the controls wrap and the
-  // head is intentionally shorter, so height is only asserted at desktop width.
-  if (!label.includes('phone') && r.runningHead && r.tokens.headerH && Math.abs(r.runningHead.h - px(r.tokens.headerH)) > 2)
-    fail(label, `running head is ${r.runningHead.h}px, --header-h says ${r.tokens.headerH}`);
+  // The header band is sticky and its height is its own content: it must clear
+  // --header-h (a floor), publish that height as --band-h, and the index rail
+  // must stick below it. --header-h is deliberately NOT a fixed header height.
+  if (r.sticky.header !== 'sticky' || r.sticky.headerTop !== '0px')
+    fail(label, `the header band is ${r.sticky.header} / top ${r.sticky.headerTop} — the masthead band must be sticky at top 0`);
+  if (r.tokens.headerH && r.band && r.band.h < px(r.tokens.headerH))
+    fail(label, `header band is ${r.band.h}px, below the --header-h floor of ${r.tokens.headerH}`);
+  if (r.band && px(r.bandVar) !== r.band.h)
+    fail(label, `--band-h is ${r.bandVar} but the band measures ${r.band.h}px — the sticky offsets below it are wrong`);
+  if (r.sticky.index === 'sticky') {
+    const want = px(r.bandVar) + 16;
+    const got = px(r.sticky.indexTop);
+    if (label.includes('phone')) {
+      // Below 1000px the plan is a strip that sticks directly under the band.
+      if (got !== px(r.bandVar)) fail(label, `the index strip sticks at ${r.sticky.indexTop}, must sit at --band-h (${px(r.bandVar)}px)`);
+    } else if (Math.abs(got - want) > 2) {
+      fail(label, `the index rail sticks at ${r.sticky.indexTop}, must sit at --band-h + 1rem (${want}px)`);
+    }
+  }
   if (r.rhythm.yearToFirstRow !== null && r.rhythm.yearToFirstRow < 8)
     fail(label, `a year marker sits ${r.rhythm.yearToFirstRow}px above its first row`);
   if (r.rhythm.mastheadToContents !== null && r.rhythm.mastheadToContents < 24)

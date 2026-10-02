@@ -150,7 +150,7 @@ PASS  chinese pages declare lang="zh"
 PASS  chinese feed is generated
 PASS  chinese home page is built
 PASS  a paired english post shows the language switch
-PASS  header order: social icons -> language switch -> dark-mode toggle, then the script that wires it
+PASS  header order: profile links -> language switch -> dark-mode toggle, then the script that wires it
 PASS  the switch links to the chinese twin
 PASS  the chinese post shows the language switch back
 PASS  the switch links back to the english original

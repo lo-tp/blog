@@ -50,11 +50,14 @@
 - id: chrome_date_format
   translation: '2006年1月2日'
 
-- id: chrome_here
-  translation: '正在阅读'
-
 - id: chrome_pair
   translation: '另一语言版本'
+
+- id: chrome_pair_mark
+  translation: '另有'
+
+- id: chrome_record_switch
+  translation: '以该语言阅读这条记录'
 
 - id: chrome_record_earlier
   translation: '更早的记录'

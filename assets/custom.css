@@ -98,7 +98,13 @@
      body face is wider than an average character, so 57ch lands near 75
      characters per line at 17px — the end of the comfortable band, not past it. */
   --measure-read: 57ch;
+  /* --header-h is the FLOOR the header band must clear, not its height: a
+     masthead at clamp(2.4rem …) plus its imprint row is taller than 64px on
+     desktop. .masthead-band reports its measured height into --band-h and the
+     sticky index rail and the year anchors use that; --header-h only keeps a
+     minimum, so the band never collapses. */
   --header-h: 64px;
+  --band-h: 0px;
 
   /* The only spacing rhythm on the page. More above a heading than below it. */
   --head-room: 2.75rem;
@@ -275,62 +281,11 @@ hr {
   padding: 0 clamp(1rem, 3vw, 2rem);
 }
 
-.running-head {
-  display: flex;
-  align-items: center;
-  gap: var(--nav-gap);
-  min-height: var(--header-h);
-  border-bottom: 1px solid var(--rule);
-  flex-wrap: nowrap;
-}
-
-.running-head__id {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.running-head__spacer {
-  margin-left: auto;
-}
-
-.running-head__id:hover {
-  color: var(--ink);
-}
-
-.running-head__name {
-  font-family: var(--f-display);
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-/* On inner pages the running head carries the section, the way a book's running
-   head names the part you are in. */
-.running-head__part {
-  font-family: var(--f-display);
-  font-weight: 500;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-
-.running-head__controls {
-  display: flex;
-  align-items: center;
-  gap: var(--nav-gap);
-}
-
-/* Title-page controls: the same row the running head carries — profile links →
-   language switch → dark-mode dial — printed under the masthead, each of the
-   reader's own two controls named in the apparatus voice. The labels use the
-   running head's label setting; the Chinese edition sets them in its own head
-   face, as every other apparatus label does. */
+/* The header's control row: profile links → language switch → dark-mode dial.
+   On the title page each of the reader's own two controls is named in the
+   apparatus voice; on inner pages the row is unlabelled, because the masthead
+   at Part Title scale is already its left half. The Chinese edition sets the
+   labels in its own head face, as every other apparatus label does. */
 .frontmatter-controls {
   display: flex;
   align-items: center;
@@ -462,8 +417,33 @@ html.dark .btn-dark .shade {
 }
 
 /* ----------------------------------------------------------------------------
-   5. Front matter (home) — the masthead, not a hero
+   5. The header — the masthead band, sticky on every page
    --------------------------------------------------------------------------- */
+
+/* The header IS the title page's masthead band: masthead, then its imprint row
+   carrying the profile links and the two edition controls, then the 2px rule.
+   It is sticky at the top of the sheet on every page and it is not sticky
+   inside: the band is one piece, so `--header-h` is a *minimum* — the band's
+   own height comes from its padding and the masthead's scale, and
+   .masthead-band measures it so the sticky index rail and the #y#### anchors
+   sit below it rather than under it. */
+.masthead-band {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--paper);
+}
+
+/* The band's height is its own content, so nothing guesses it. header.html's
+   script observes the band and writes the number here; the index rail's sticky
+   offset and every #y#### scroll margin are computed from it. */
+.masthead-band {
+  min-height: var(--header-h);
+}
+
+html.dark .masthead-band {
+  background: var(--night-paper);
+}
 
 .frontmatter {
   display: grid;
@@ -500,8 +480,29 @@ html.dark .btn-dark .shade {
 }
 
 .frontmatter--part {
-  padding-top: var(--g-1);
-  padding-bottom: var(--g-3);
+  padding-top: var(--g-2);
+  padding-bottom: var(--g-2);
+}
+
+/* Inner pages: the edition's name in the header, with the part of the edition
+   you are in named beside it — the running head's job, done in the masthead's
+   voice. */
+a.masthead--part {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.masthead__part {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
 }
 
 /* The masthead band prints tight against the masthead: the bio line alone. */
@@ -523,8 +524,7 @@ html.dark .btn-dark .shade {
   white-space: nowrap;
 }
 
-/* The masthead profile glyphs sit at the sheet's right edge, matching the
-   running head's drawn icons. */
+/* The profile glyphs sit at the sheet's right edge. */
 .imprint .social {
   justify-content: flex-end;
 }
@@ -543,7 +543,7 @@ html.dark .btn-dark .shade {
 
 .index {
   position: sticky;
-  top: calc(var(--header-h) + 1rem);
+  top: calc(var(--band-h) + 1rem);
   display: grid;
   gap: var(--g-3);
 }
@@ -774,7 +774,7 @@ html.dark .btn-dark .shade {
 
 .year {
   margin-top: var(--head-room);
-  scroll-margin-top: calc(var(--header-h) + 1rem);
+  scroll-margin-top: calc(var(--band-h) + 1rem);
 }
 
 /* The ledger prints flush at the top of the spread: the first year group
@@ -901,45 +901,31 @@ html.dark .btn-dark .shade {
   border-color: var(--nav);
 }
 
-/* The facing pair: two halves printed under one date, joined by a rule, sharing
-   one folio. Only a record with a twin prints this way — an Untranslated post
-   simply holds the full measure, with no empty half and no apology. */
+/* One title per row. A paired record is marked, not doubled: a short language
+   mark names that a twin exists and links straight to it, so the pairing stays
+   visible in the index without printing the other edition's title. An
+   Untranslated post prints no mark at all — a legal state, not a debt. */
 .rec[data-paired] {
-  grid-template-columns: 6.2rem 1fr 1px 1fr;
+  grid-template-columns: 6.2rem 1fr auto;
 }
 
-.rec__gutter {
-  align-self: stretch;
-  background: var(--rule);
-  width: 1px;
-}
-
-.rec__twin {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.rec__twin-link {
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.35;
-  font-weight: 600;
-  color: var(--ink-2);
-  text-decoration: none;
-  text-wrap: pretty;
-}
-
-.rec:hover .rec__twin-link {
-  color: var(--nav);
-}
-
-.rec__twin-label {
+.rec__pair-mark {
+  align-self: start;
   font-family: var(--f-display);
   font-weight: 600;
   font-size: 0.7rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-3);
+  text-decoration: none;
+  border: 1px solid var(--rule-2);
+  padding: 0.25rem 0.4rem;
+  white-space: nowrap;
+}
+
+:lang(zh) .rec__pair-mark {
+  font-family: var(--f-cjk-head);
+  letter-spacing: 0.06em;
 }
 
 /* Named states, never colour alone. */
@@ -1342,51 +1328,53 @@ html.dark .btn-dark .shade {
   color: var(--ink-3);
 }
 
-/* Facing pair, printed at the end of a record when a twin exists. */
-.pair {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
-  gap: 1.25rem;
-  align-items: stretch;
+/* The edition switch, printed at the end of a record that has a twin. The page
+   carries only the language being read; the other edition is reached by
+   switching, so it is a named control, never a second column of the same
+   record printed beside it. */
+.edition-switch {
+  display: flex;
+  justify-content: flex-end;
   margin-top: var(--head-room);
   padding-top: var(--g-2);
   border-top: 2px solid var(--ink);
 }
 
-.pair__gutter {
-  background: var(--rule);
-  width: 1px;
-}
-
-.pair a {
-  display: block;
-  font-weight: 700;
-  color: var(--ink);
+.edition-switch__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
   text-decoration: none;
-  font-size: 1.05rem;
-  line-height: 1.35;
 }
 
-.pair a:hover {
+.edition-switch__link .label {
+  color: var(--ink-3);
+}
+
+.edition-switch__language {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--rule-2);
   color: var(--nav);
+  white-space: nowrap;
 }
 
-.pair .label {
-  display: block;
-  margin-bottom: 0.35rem;
+:lang(zh) .edition-switch__language {
+  font-family: var(--f-cjk-head);
+  letter-spacing: 0.06em;
 }
 
-/* One half is always filled: the record being read, named and marked, opposite
-   its twin. A pair band is never a half-empty row. */
-.pair__current {
-  display: block;
-  font-weight: 700;
-  color: var(--ink);
-  font-size: 1.05rem;
-  line-height: 1.35;
+.edition-switch__link:hover .edition-switch__language,
+.edition-switch__link:focus-visible .edition-switch__language {
+  border-color: var(--nav);
+  background: var(--paper-2);
+  color: var(--nav-hover);
 }
 
-.pair__half--here .label {
+.edition-switch__link:hover .label {
   color: var(--mark);
 }
 
@@ -1476,7 +1464,7 @@ html.dark .btn-dark .shade {
 
   .index {
     position: sticky;
-    top: 0;
+    top: var(--band-h);
     z-index: 20;
     background: var(--paper);
     padding: 0.7rem 0;
@@ -1538,38 +1526,10 @@ html.dark .btn-dark .shade {
     font-size: 16px;
   }
 
-  .running-head {
-    flex-wrap: wrap;
-    gap: 0.55rem var(--nav-gap);
-    padding: 0.6rem 0;
-    min-height: 0;
-  }
-
-  .running-head__spacer {
-    display: none;
-  }
-
-  .running-head__id {
-    margin-right: 0;
-  }
-
-  .running-head__part {
-    order: 3;
-    flex-basis: 100%;
-  }
-
   .rec,
   .rec[data-paired] {
     grid-template-columns: 1fr;
     gap: 0.35rem;
-  }
-
-  .rec__gutter {
-    display: none;
-  }
-
-  .rec[data-paired] {
-    border-left: 0;
   }
 
   .rec__date {
@@ -1580,13 +1540,8 @@ html.dark .btn-dark .shade {
     font-size: 1.2rem;
   }
 
-  .adjacent,
-  .pair {
+  .adjacent {
     grid-template-columns: 1fr;
-  }
-
-  .pair__gutter {
-    display: none;
   }
 
   .adjacent a:last-child {
@@ -1624,40 +1579,20 @@ html.dark .btn-dark .shade {
 /* The ledger does not animate itself in: a row's date and title hold their full
    contrast at every scroll position, and a printed page does not fade itself into
    view. The one authored interaction belongs to the subject instead — a paired
-   record opens. The centre rule draws its full length, the joining hairline
-   takes the reserved ink, the twin title takes its underline. Whole steps,
-   120ms, only on a row that really has a twin, triggered by the reader reaching
-   for it. */
-.rec[data-paired] .rec__gutter {
-  transform-origin: center;
-  transform: scaleY(0.42);
-  transition: transform var(--step) var(--ease);
+   record's language mark steps from Muted Ink to the reserved ink and takes its
+   underline when the reader reaches for it. Whole steps, 120ms, only on a row
+   that really has a twin. */
+.rec__pair-mark {
+  transition: color var(--step) var(--ease), border-color var(--step) var(--ease);
 }
 
-.rec[data-paired]:hover .rec__gutter,
-.rec[data-paired]:focus-within .rec__gutter {
-  transform: scaleY(1);
-}
-
-.rec[data-paired] .rec__twin {
-  transition: color var(--step) var(--ease);
-}
-
-.rec[data-paired]:hover .rec__twin-label,
-.rec[data-paired]:focus-within .rec__twin-label {
+.rec[data-paired]:hover .rec__pair-mark,
+.rec[data-paired]:focus-within .rec__pair-mark,
+.rec__pair-mark:hover,
+.rec__pair-mark:focus-visible {
   color: var(--mark);
-}
-
-.rec[data-paired]:hover .rec__twin-link,
-.rec[data-paired]:focus-within .rec__twin-link {
+  border-color: var(--mark);
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rec[data-paired] .rec__gutter {
-    transform: none;
-    transition: none;
-  }
+  text-underline-offset: 3px;
 }

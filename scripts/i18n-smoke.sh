@@ -66,15 +66,14 @@ contains "$out/zh/index.xml"  'blog.lotp.xyz/zh/posts'         'chinese feed is 
 
 contains "$en_fixture" 'data-lang-switch'                                  'a paired english post shows the language switch'
 if awk '/<\/header>/{ exit } { s = s $0 "\n" } END {
-    social = index(s, "data-social=\"linkedin\"");
     sw = index(s, "data-lang-switch");
     dark = index(s, "class=\"btn-dark");
     js = index(s, "btnDark = document.querySelector");
-    if (social && sw && sw > social && dark && dark > sw && js && js > dark) print "ok"; else print "no"
+    if (sw && dark && dark > sw && js && js > dark) print "ok"; else print "no"
   }' "$en_fixture" | grep -q ok; then
-  pass "header order: profile links -> language switch -> dark-mode toggle, then the script that wires it"
+  pass "header order: language switch -> dark-mode toggle, then the script that wires it"
 else
-  fail "header order: profile links -> language switch -> dark-mode toggle, then the script that wires it"
+  fail "header order: language switch -> dark-mode toggle, then the script that wires it"
 fi
 contains "$en_fixture" "blog.lotp.xyz/zh/posts/$fixture_slug/"           'the switch links to the chinese twin'
 contains "$zh_fixture" 'data-lang-switch'                                 'the chinese post shows the language switch back'

@@ -41,7 +41,7 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 - Articles are Markdown in `content/posts/`, one file per language, paired by `translationKey` on **both** files.
 - Local work: `./hugo server` (English at `:1313/`, Chinese at `:1313/zh/`); `scripts/new-zh-post.sh` scaffolds a translation; `scripts/i18n-status.sh` reports what is left to do; `scripts/i18n-smoke.sh` proves the wiring; `scripts/measure-home-gap.sh` measures the rendered rhythm and the header control contract in a headless browser, and fails when the render disagrees with the stylesheet's own tokens.
 - Publishing: GitHub Actions builds with Hugo 0.166.0, runs the i18n smoke check **before** pushing, and publishes to `lo-tp/lo-tp.github.io`, served at `blog.lotp.xyz` (`static/CNAME`). `deploy.sh` is the manual equivalent.
-- Reading scenes: desktop browser and phone — the running head keeps its controls at every width, there is no menu to open — in both light and dark mode.
+- Reading scenes: desktop browser and phone — the header band keeps its controls at every width, there is no menu to open — in both light and dark mode.
 - Existing materials: `static/images/` post images and GIFs, `static/portrait.jpeg`, robots.txt, and the self-hosted display face in `static/fonts/`. The visual world is documented in [DESIGN.md](./DESIGN.md).
 
 ## Capabilities and Constraints
@@ -52,9 +52,9 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 
 **Terminology is fixed.** Use Original, Translation pair, Untranslated post, Orphan translation, Translation drift, Author translation as defined in `CONTEXT.md`; avoid its listed `_Avoid_` synonyms. Inside Chinese prose, code, commands, file paths, API/library/product names and people's names stay English (保留原文).
 
-**Hard requirement stated by the author:** links to GitHub (`lo-tp`), X (`lo__tp`) and LinkedIn must stay present and reachable. They sit in the running head in the order profile links → language switch → dark-mode dial, at every width including a phone, with the script that wires the dial after them.
+**Hard requirement stated by the author:** links to GitHub (`lo-tp`), X (`lo__tp`) and LinkedIn must stay present and reachable, on every page. They sit in the header — the masthead band, sticky at the top of the sheet — in the order profile links → language switch → dark-mode dial, at every width including a phone, with the script that wires the dial after them. The index rail's author plate carries them a second time on the title page.
 
-**The site owns its templates and its stylesheet.** No template from hugo-paper renders; hugo-paper stays installed only for its i18n strings (`prev_page` / `next_page` and the rest of the Chinese chrome) and its static assets (social icons, favicon). The file-by-file ownership map is in `docs/zh.md`. Two traps stay live: in a content template nothing may render outside the `define` blocks, and the running head's script must stay after the controls it wires.
+**The site owns its templates and its stylesheet.** No template from hugo-paper renders; hugo-paper stays installed only for its i18n strings (`prev_page` / `next_page` and the rest of the Chinese chrome) and its static assets (social icons, favicon). The file-by-file ownership map is in `docs/zh.md`. Two traps stay live: in a content template nothing may render outside the `define` blocks, and the header band's script must stay after the controls it wires.
 
 **Spacing, colour and motion have one source.** `assets/custom.css` is the site's only stylesheet — `layouts/partials/head.html` requests it and nothing else, so no framework CSS is loaded. Measures, spacing rhythm, colour, state and movement come from its tokens (`--nav-gap`, `--g-*`, `--header-h`, `--measure-*`, `--row-gap`, `--block-gap`, `--head-room`, `--step`). Change a token, never a selector in a template.
 
@@ -98,4 +98,4 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 
 No formal standard is required — the author asked for the ordinary baseline, which here means: readable contrast in both light and dark mode, keyboard-operable controls, real `alt` text on post images, visible focus, and a layout that works on a phone with no hover available.
 
-Formerly known friction, now resolved by the current design: the header controls used to collapse into a menu overlay on a phone, so dark mode took two taps; they are in the running head at every width now. What still has to stay correct is the Chinese edition's `lang="zh"` and Chinese date formatting, which the smoke check guards.
+Formerly known friction, now resolved by the current design: the header controls used to collapse into a menu overlay on a phone, so dark mode took two taps; they are in the header band at every width now. What still has to stay correct is the Chinese edition's `lang="zh"` and Chinese date formatting, which the smoke check guards.

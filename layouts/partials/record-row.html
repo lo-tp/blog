@@ -3,12 +3,16 @@
 
   Usage: partial "record-row.html" (dict "page" $p)
 
-  A record with a twin prints as two halves joined by a gutter rule under one
-  date — that is the facing pair, and it is the only place the site shows a
-  record twice. A record without a twin keeps the full measure: no empty half,
-  no placeholder, no "missing translation" label. An Untranslated post is a
-  legal, permanent state (CONTEXT.md), and nothing in this row may imply it is
-  a debt.
+  One title per row: the ledger lists the records of the edition being read, and
+  nothing from the other language is printed beside them. A paired record is
+  marked, never doubled — a short language mark names that a twin exists and
+  links to it, so the pairing stays visible in the index without showing the
+  other edition's title. Reaching the twin means switching, which is what
+  ADR 0001 chose explicitly.
+
+  A record without a twin prints no mark at all: no placeholder, no "missing
+  translation" label. An Untranslated post is a legal, permanent state
+  (CONTEXT.md), and nothing in this row may imply it is a debt.
 */ -}}
 {{- $p := .page -}}
 {{- $twins := slice -}}
@@ -39,16 +43,11 @@
     {{- end -}}
   </div>
 
-  {{- if $twin -}}
-  <span class="rec__gutter" aria-hidden="true"></span>
-  <div class="rec__twin">
-    <span class="rec__twin-label"
-      >{{- or $twin.Language.Label $twin.Language.Lang -}}</span>
-    <a
-      class="rec__twin-link"
-      hreflang="{{- $twin.Language.Locale -}}"
-      href="{{- $twin.RelPermalink -}}"
-      >{{- $twin.Title -}}</a>
-  </div>
+  {{- with $twin -}}
+  <a
+    class="rec__pair-mark"
+    hreflang="{{- .Language.Locale -}}"
+    href="{{- .RelPermalink -}}"
+    >{{- i18n "chrome_pair_mark" (or .Language.Label .Language.Lang) -}}</a>
   {{- end -}}
 </li>

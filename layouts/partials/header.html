@@ -1,124 +1,156 @@
 {{- /*
-  header.html — the running head.
+  header.html — the header: the masthead band, printed once, on every page.
 
-  A book's running head names the work and the part you are in. Here it is the
-  site name, the part of the edition being read, then the three controls the
-  reader may need on any page: the profile links, the language of this record,
-  and the day/night edition.
+  There is no running head any more. The row that used to sit *below* the
+  running head on the title page is now the header itself: the masthead, then
+  its imprint row carrying the profile glyphs and the reader's own two edition
+  controls — the language of this record and the day/night edition.
 
-  scripts/i18n-smoke.sh asserts the order of that row and of the script that
-  wires it: profile links -> language switch -> dark-mode toggle -> the script
-  that finds the toggle. Keep them in this order, and keep `class="btn-dark"`
-  and `btnDark = document.querySelector` intact.
+  What the masthead says depends on the page kind, because the header is the
+  page's own title line:
+    * title page      → the site name (the edition's masthead)
+    * section / tag   → the index name, in the Part Title setting
+    * a record        → the edition's name, so the record stays reachable from
+                        anywhere; the record's own title is printed by
+                        single.html as the page's H1.
 
-  Two things this row no longer does:
-    * It is not a menu any more. The controls are in the bar at every width, so
-      switching editions on a phone is one tap instead of two — the friction
-      docs/zh.md used to describe.
-    * The icons resolve at the site root. `./linkedin.svg`, as the theme wrote
-      it, resolves against the current page path and 404s on /tags/…/ pages.
+  scripts/i18n-smoke.sh asserts the control order in the imprint row and the
+  script that wires the dial: profile links -> language switch -> dark-mode
+  toggle -> the script that finds the toggle. Keep them in this order, and keep
+  `class="btn-dark"` and `btnDark = document.querySelectorAll` intact — the
+  script must stay after the controls it wires.
+
+  The icons resolve at the site root: `printf "%s.svg" .id | absURL`, not the
+  theme's relative `./linkedin.svg`, which 404s on /tags/…/ pages.
 */ -}}
-<header class="sheet">
-  <div class="running-head">
+{{- $isRecord := eq .Kind "page" -}}
+{{- $isPart := or (eq .Kind "term") (eq .Kind "taxonomy") (and (eq .Kind "section") (not .IsHome)) -}}
+<header class="sheet masthead-band">
+  <a class="visually-hidden-focusable" href="#contents">{{- i18n "chrome_skip" -}}</a>
+  <div class="frontmatter{{ if or $isPart $isRecord }} frontmatter--part{{ end }}">
     {{- if .IsHome -}}
-    <a class="visually-hidden-focusable" href="#contents">{{- i18n "chrome_skip" -}}</a>
+    <h1 class="masthead">
+      <a href="{{- "/" | absLangURL -}}">{{- site.Params.name | default site.Title -}}</a>
+    </h1>
+    {{- else if $isPart -}}
+    {{- /* Hugo's term title is the lowercased key, so the header names the
+      technique from the index data, in the author's own spelling of it. */ -}}
+    {{- $key := urlize .Title -}}
+    {{- $label := .Title -}}
+    {{- if eq .Kind "term" -}}
+    {{- $index := append (.Scratch.Get "techniques") (.Scratch.Get "singles") -}}
+    {{- range $entry := $index -}}
+    {{- if eq $entry.key $key -}}
+    {{- $label = $entry.name -}}
+    {{- end -}}
+    {{- end -}}
+    {{- else if eq .Kind "taxonomy" -}}
+    {{- $label = i18n "chrome_index" -}}
+    {{- end -}}
+    <h1 class="masthead masthead--part">{{- $label -}}</h1>
     {{- else -}}
-    <a class="running-head__id" href="{{- "/" | absLangURL -}}">
-      <span class="running-head__name">{{- site.Params.name | default site.Title -}}</span>
-      {{- $part := i18n "chrome_record" -}}
-      {{- if or (eq .Kind "term") (eq .Kind "taxonomy") -}}
-      {{- $part = i18n "chrome_index" -}}
-      {{- end -}}
-      <span class="running-head__part">{{- $part -}}</span>
+    <a class="masthead masthead--part" href="{{- "/" | absLangURL -}}">
+      <span class="masthead__name">{{- site.Params.name | default site.Title -}}</span>
+      <span class="masthead__part">{{- i18n "chrome_record" -}}</span>
     </a>
     {{- end -}}
 
-    {{- /* The controls stay at the right edge of the measure at every width. */ -}}
-    <span class="running-head__spacer" aria-hidden="true"></span>
+    <div class="imprint">
+      <nav class="frontmatter-controls" aria-label="{{- i18n "chrome_profile" -}} · {{- i18n "chrome_edition" -}}">
+        {{- $services := slice -}}
+        {{- if site.Params.github -}}{{- $services = $services | append (dict "id" "github" "label" "GitHub" "href" (print "https://github.com/" site.Params.github)) -}}{{- end -}}
+        {{- if site.Params.twitter -}}{{- $services = $services | append (dict "id" "twitter" "label" "X" "href" (print "https://x.com/" site.Params.twitter)) -}}{{- end -}}
+        {{- if site.Params.linkedin -}}{{- $services = $services | append (dict "id" "linkedin" "label" "LinkedIn" "href" (print "https://www.linkedin.com/in/" site.Params.linkedin)) -}}{{- end -}}
+        {{- with $services -}}
+        <nav class="social" aria-label="{{- i18n "chrome_profile" -}}">
+          {{- range . -}}
+          <a
+            data-social="{{- .id -}}"
+            style="--url: url({{- printf "%s.svg" .id | absURL -}})"
+            href="{{- .href -}}"
+            target="_blank"
+            rel="me noopener"
+          >{{- .label -}}</a>
+          {{- end -}}
+        </nav>
+        {{- end -}}
 
-    {{- $services := slice -}}
-    {{- if site.Params.github -}}{{- $services = $services | append (dict "id" "github" "label" "GitHub" "href" (print "https://github.com/" site.Params.github)) -}}{{- end -}}
-    {{- if site.Params.twitter -}}{{- $services = $services | append (dict "id" "twitter" "label" "X" "href" (print "https://x.com/" site.Params.twitter)) -}}{{- end -}}
-    {{- if site.Params.linkedin -}}{{- $services = $services | append (dict "id" "linkedin" "label" "LinkedIn" "href" (print "https://www.linkedin.com/in/" site.Params.linkedin)) -}}{{- end -}}
-
-    {{- with $services -}}
-    <nav class="social" aria-label="{{- i18n "chrome_profile" -}}">
-      {{- range . -}}
-      <a
-        data-social="{{- .id -}}"
-        style="--url: url({{- printf "%s.svg" .id | absURL -}})"
-        href="{{- .href -}}"
-        target="_blank"
-        rel="me noopener"
-        >{{- .label -}}</a>
-      {{- end -}}
-    </nav>
-    {{- end -}}
-
-    {{- partial "lang-switch.html" (dict "page" . "navClass" "lang-switch" "linkClass" "") -}}
-
-    <div class="running-head__controls">
-      <div
-        class="btn-dark"
-        role="button"
-        tabindex="0"
-        aria-label="{{- i18n "chrome_theme_toggle" -}}"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle class="dial" cx="12" cy="12" r="8.5" />
-          <path class="shade" d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
-        </svg>
-      </div>
+        {{- $edition := "" -}}
+        {{- if or $isPart $isRecord -}}
+        {{- /* Inner pages keep the row's shape — profile links, then the language
+          of this record, then the day/night dial — without the title page's labels:
+          the masthead at Part Title scale is already the row's left half. */ -}}
+        {{- $edition = partial "edition-controls.html" (dict "page" . "labelled" false) -}}
+        {{- else -}}
+        {{- $edition = partial "edition-controls.html" (dict "page" . "labelled" true) -}}
+        {{- end -}}
+        {{- $edition -}}
+      </nav>
     </div>
-
-    <script>
-      // base
-      const htmlClass = document.documentElement.classList;
-      setTimeout(() => {
-        htmlClass.remove("not-ready");
-      }, 10);
-
-      // dark and light editions
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      const paper = "#f2f3f4";
-      const slate = "#141719";
-      const setDark = (isDark) => {
-        metaTheme.setAttribute("content", isDark ? slate : paper);
-        htmlClass[isDark ? "add" : "remove"]("dark");
-        try {
-          localStorage.setItem("dark", isDark);
-        } catch (e) {}
-      };
-
-      // init (baseof already applied the stored choice before paint)
-      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-      if (htmlClass.contains("dark")) {
-        setDark(true);
-      } else {
-        const darkVal = localStorage.getItem("dark");
-        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
-      }
-
-      // follow the system until the reader overrides it
-      darkScheme.addEventListener("change", (event) => {
-        setDark(event.matches);
-      });
-
-      // the toggle itself — every page carries one dial: the running head's, and on
-      // the title page the masthead controls' too. Wire them all; the contract is one
-      // control per row, not one per page.
-      const btnDark = document.querySelectorAll(".btn-dark");
-      btnDark.forEach((node) => {
-        node.addEventListener("click", () => {
-          setDark(localStorage.getItem("dark") !== "true");
-        });
-        node.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setDark(localStorage.getItem("dark") !== "true");
-          }
-        });
-      });
-    </script>
   </div>
+
+  <script>
+    // base
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove("not-ready");
+    }, 10);
+
+    // The band is sticky, and its height is its own content. Publish it as
+    // --band-h so the sticky index rail and the #y#### anchors sit below it
+    // instead of under it. One element: this header.
+    const band = document.querySelector(".masthead-band .frontmatter");
+    const publishBandHeight = () => {
+      if (band) {
+        document.documentElement.style.setProperty(
+          "--band-h",
+          band.getBoundingClientRect().height + "px",
+        );
+      }
+    };
+    publishBandHeight();
+    addEventListener("resize", publishBandHeight);
+    addEventListener("load", publishBandHeight);
+
+    // dark and light editions
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const paper = "#f2f3f4";
+    const slate = "#141719";
+    const setDark = (isDark) => {
+      metaTheme.setAttribute("content", isDark ? slate : paper);
+      htmlClass[isDark ? "add" : "remove"]("dark");
+      try {
+        localStorage.setItem("dark", isDark);
+      } catch (e) {}
+    };
+
+    // init (baseof already applied the stored choice before paint)
+    const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    if (htmlClass.contains("dark")) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem("dark");
+      setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+    }
+
+    // follow the system until the reader overrides it
+    darkScheme.addEventListener("change", (event) => {
+      setDark(event.matches);
+    });
+
+    // the toggle itself. On the title page the dial sits in this band and the
+    // index rail's author plate carries a second one; wire them all.
+    const btnDark = document.querySelectorAll(".btn-dark");
+    btnDark.forEach((node) => {
+      node.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+      node.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setDark(localStorage.getItem("dark") !== "true");
+        }
+      });
+    });
+  </script>
 </header>
