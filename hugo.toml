@@ -1,3 +1,9 @@
+# The published origin. `hugo` (and `hugo server` without `-b`) builds with this, which is
+# what deploy.sh publishes. For any local preview — `hugo server`, `python -m http.server`
+# over public/, impeccable live mode — override it (`hugo server -b http://127.0.0.1:1313/`)
+# or rebuild public/ with `hugo -b http://127.0.0.1:8090/`; otherwise every asset URL in the
+# served page is absolute and cross-origin, so the stylesheet and the display face come from
+# the deployed site rather than the code you are editing. See scripts/measure-home-gap.sh:29.
 baseURL = "https://blog.lotp.xyz/"
 title = "Lotp's Blog"
 DefaultContentLanguage = "en"
