@@ -1,0 +1,164 @@
+{
+ "schemaVersion": 2,
+ "generatedAt": "2026-10-02T02:53:08+00:00",
+ "title": "Design System: Lotp's Blog — Facing Pages",
+ "extensions": {
+  "colorMeta": {
+   "paper": {
+    "role": "neutral",
+    "displayName": "Cool Paper",
+    "canonical": "#f2f3f4",
+    "note": "The page. Deliberately cool, not cream."
+   },
+   "graphite-plate": {
+    "role": "surface",
+    "displayName": "Graphite Plate",
+    "canonical": "#1b2023",
+    "note": "The one dark surface in either edition: code."
+   },
+   "ink": {
+    "role": "neutral",
+    "displayName": "Graphite Ink",
+    "canonical": "#1a1a1f",
+    "note": "Text and structural rules."
+   },
+   "ink-muted": {
+    "role": "neutral",
+    "displayName": "Muted Ink",
+    "canonical": "#5f666c",
+    "contrastOnPaper": 5.25,
+    "note": "Secondary chrome. Was #6d747a (4.27:1) until the craft floor raised it."
+   },
+   "technical-blue": {
+    "role": "primary",
+    "displayName": "Technical Blue",
+    "canonical": "#2f5d8a",
+    "contrastOnPaper": 6.19,
+    "note": "Navigation only."
+   },
+   "brick": {
+    "role": "secondary",
+    "displayName": "Brick",
+    "canonical": "#b03f26",
+    "contrastOnPaper": 5.27,
+    "note": "Reserved ink: the record or technique the reader is on. Was #c0492f (4.46:1)."
+   },
+   "night-paper": {
+    "role": "neutral",
+    "displayName": "Night Paper",
+    "canonical": "#141719",
+    "note": "The same page printed on slate; accents dim with the paper so ratios hold."
+   }
+  },
+  "typographyMeta": {
+   "masthead": {
+    "displayName": "Masthead",
+    "purpose": "Title page identity only."
+   },
+   "label": {
+    "displayName": "Label",
+    "purpose": "Short tracked capitals for apparatus: Contents, Index of techniques, named states."
+   },
+   "folio": {
+    "displayName": "Folio",
+    "purpose": "Dates, counts, pagination position, year spine. Tabular figures."
+   },
+   "body": {
+    "displayName": "Body (Latin)",
+    "purpose": "Article prose. 57ch measure ≈ 75 characters per line."
+   },
+   "body-cjk": {
+    "displayName": "Body (Chinese)",
+    "purpose": "Songti prose, PingFang headings — the Chinese edition is typeset, not translated."
+   }
+  },
+  "shadows": [],
+  "motion": [
+   {
+    "name": "step",
+    "value": "120ms",
+    "purpose": "Every state change is one short whole step."
+   },
+   {
+    "name": "ease",
+    "value": "cubic-bezier(0.2, 0, 0.2, 1)",
+    "purpose": "Exponential ease-out. Nothing overshoots."
+   },
+   {
+    "name": "pair-open",
+    "value": "transform: scaleY(0.42) → scaleY(1) on .rec__gutter",
+    "purpose": "The one authored interaction: a paired ledger row opens its facing half."
+   },
+   {
+    "name": "no-scroll-reveal",
+    "value": "none",
+    "purpose": "Removed on purpose: opacity animation made ledger dates read at 1.0–1.3:1 contrast mid-scroll."
+   }
+  ],
+  "breakpoints": [
+   {
+    "name": "spread-collapse",
+    "value": "1000px",
+    "purpose": "The index plan stops being a column and travels with the ledger as a sticky bar."
+   },
+   {
+    "name": "single-column",
+    "value": "720px",
+    "purpose": "Rows collapse; a paired twin prints under its own title; the running head wraps but keeps its control order."
+   }
+  ],
+  "measures": [
+   {
+    "name": "sheet",
+    "value": "1220px"
+   },
+   {
+    "name": "index-rail",
+    "value": "264px"
+   },
+   {
+    "name": "reading",
+    "value": "57ch",
+    "note": "≈75 characters per line at 17px. Was 68ch, which measured ~99 characters."
+   },
+   {
+    "name": "running-head",
+    "value": "64px"
+   }
+  ]
+ },
+ "components": [
+  {
+   "name": "Ledger row (paired)",
+   "kind": "list-item",
+   "refersTo": "ledger-row",
+   "description": "One date, two languages, one gutter rule.",
+   "html": "<li class=\"rec\" data-paired=\"true\"><span class=\"rec__date num\">2026-03-01</span><div class=\"rec__main\"><h3 class=\"rec__title\"><a href=\"#\">I Let My Coding Agent Manage My Notion Tasks</a></h3><ul class=\"rec__tags\"><li><a href=\"#\">编程代理</a></li></ul></div><span class=\"rec__gutter\"></span><div class=\"rec__twin\"><span class=\"rec__twin-label\">中文</span><a class=\"rec__twin-link\" hreflang=\"zh\">我让编程代理管理我的 Notion 任务</a></div></li>",
+   "css": ".rec{display:grid;grid-template-columns:6.2rem 1fr;gap:1.2rem;align-items:baseline;border-bottom:1px solid color-mix(in srgb,var(--rule) 65%,transparent)}.rec[data-paired]{grid-template-columns:6.2rem 1fr 1px 1fr}.rec__gutter{align-self:stretch;background:var(--rule);width:1px;transform-origin:center;transform:scaleY(.42);transition:transform var(--step) var(--ease)}.rec[data-paired]:hover .rec__gutter,.rec[data-paired]:focus-within .rec__gutter{transform:scaleY(1)}.rec__date{font-family:var(--f-display);font-weight:600;font-size:.8rem;font-variant-numeric:tabular-nums;color:var(--ink-3)}"
+  },
+  {
+   "name": "Language switch",
+   "kind": "nav",
+   "refersTo": "language-switch",
+   "description": "Appears only where a translation twin exists.",
+   "html": "<span class=\"lang-switch\"><a hreflang=\"zh\" href=\"/zh/posts/…/\">中文</a></span>",
+   "css": ".lang-switch a{display:inline-block;font-family:var(--f-display);font-weight:600;font-size:.78rem;letter-spacing:.14em;padding:.25rem .4rem;border:1px solid var(--rule-2);color:var(--nav);text-decoration:none}.lang-switch a:hover{border-color:var(--nav);background:var(--paper-2);color:var(--nav-hover)}"
+  },
+  {
+   "name": "Code plate",
+   "kind": "custom",
+   "refersTo": "code-plate",
+   "description": "The one dark surface; scrolls inside itself so a wide ASCII diagram never widens the page.",
+   "html": "<pre class=\"chroma\"><code>┌──────────────┐\n│  User        │\n└──────────────┘</code></pre>",
+   "css": ".record__body pre{background:var(--plate);border-top:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2);color:var(--on-plate);padding:1rem 1.15rem;font-size:.9rem;line-height:1.62;overflow-x:auto;max-width:100%}"
+  },
+  {
+   "name": "Page turns",
+   "kind": "nav",
+   "refersTo": "page-turns",
+   "description": "Named turns and a position, never anonymous arrows.",
+   "html": "<nav class=\"turn\"><span class=\"turn__where\">Page 2 / 5</span><div class=\"turn__nav\"><a href=\"…\">← 上一页</a><a href=\"…\">下一页 →</a></div></nav>",
+   "css": ".turn{display:flex;justify-content:space-between;gap:1rem;margin-top:var(--head-room);padding-top:var(--g-2);border-top:1px solid var(--ink)}"
+  }
+ ]
+}

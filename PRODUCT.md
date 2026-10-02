@@ -39,10 +39,10 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 ## Operating Context
 
 - Articles are Markdown in `content/posts/`, one file per language, paired by `translationKey` on **both** files.
-- Local work: `./hugo server` (English at `:1313/`, Chinese at `:1313/zh/`); `scripts/new-zh-post.sh` scaffolds a translation; `scripts/i18n-status.sh` reports what is left to do; `scripts/i18n-smoke.sh` proves the wiring; `scripts/measure-home-gap.sh` measures header/profile spacing.
+- Local work: `./hugo server` (English at `:1313/`, Chinese at `:1313/zh/`); `scripts/new-zh-post.sh` scaffolds a translation; `scripts/i18n-status.sh` reports what is left to do; `scripts/i18n-smoke.sh` proves the wiring; `scripts/measure-home-gap.sh` measures the rendered rhythm and the header control contract in a headless browser, and fails when the render disagrees with the stylesheet's own tokens.
 - Publishing: GitHub Actions builds with Hugo 0.166.0, runs the i18n smoke check **before** pushing, and publishes to `lo-tp/lo-tp.github.io`, served at `blog.lotp.xyz` (`static/CNAME`). `deploy.sh` is the manual equivalent.
-- Reading scenes: desktop browser and phone (on mobile the header items collapse into the menu overlay), in both light and dark mode.
-- Existing materials: `static/images/` post images and GIFs, `static/portrait.jpeg`, robots.txt. No visual identity work has been done beyond the theme plus `assets/custom.css`.
+- Reading scenes: desktop browser and phone — the running head keeps its controls at every width, there is no menu to open — in both light and dark mode.
+- Existing materials: `static/images/` post images and GIFs, `static/portrait.jpeg`, robots.txt, and the self-hosted display face in `static/fonts/`. The visual world is documented in [DESIGN.md](./DESIGN.md).
 
 ## Capabilities and Constraints
 
@@ -52,20 +52,20 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 
 **Terminology is fixed.** Use Original, Translation pair, Untranslated post, Orphan translation, Translation drift, Author translation as defined in `CONTEXT.md`; avoid its listed `_Avoid_` synonyms. Inside Chinese prose, code, commands, file paths, API/library/product names and people's names stay English (保留原文).
 
-**Hard requirement stated by the author:** links to GitHub (`lo-tp`), X (`lo__tp`) and LinkedIn must stay present and reachable. They currently live in the header nav in the order social icons → language switch → dark-mode toggle; on mobile all three are inside the menu overlay, which is why dark mode takes two taps on a phone.
+**Hard requirement stated by the author:** links to GitHub (`lo-tp`), X (`lo__tp`) and LinkedIn must stay present and reachable. They sit in the running head in the order profile links → language switch → dark-mode dial, at every width including a phone, with the script that wires the dial after them.
 
-**Deliberate maintenance debt.** `layouts/_default/list.html`, `layouts/_default/single.html` and `layouts/partials/header.html` are vendored copies of hugo-paper's with intentional changes (`absLangURL` tag links, the language switch's position, the header `<script>` sitting after the dark-mode toggle). Diff them against the theme before any hugo-paper update. In a content template nothing may render outside the `define` blocks.
+**The site owns its templates and its stylesheet.** No template from hugo-paper renders; hugo-paper stays installed only for its i18n strings (`prev_page` / `next_page` and the rest of the Chinese chrome) and its static assets (social icons, favicon). The file-by-file ownership map is in `docs/zh.md`. Two traps stay live: in a content template nothing may render outside the `define` blocks, and the running head's script must stay after the controls it wires.
 
-**Spacing has one source.** `assets/custom.css` owns header nav gap and home/article top spacing via `--nav-gap`, `--home-gap`, `--profile-lift`, `--post-gap`, `--article-gap`; the theme's own utilities are cancelled with `!important`. Change one variable, not several.
+**Spacing, colour and motion have one source.** `assets/custom.css` is the site's only stylesheet — `layouts/partials/head.html` requests it and nothing else, so no framework CSS is loaded. Measures, spacing rhythm, colour, state and movement come from its tokens (`--nav-gap`, `--g-*`, `--header-h`, `--measure-*`, `--row-gap`, `--block-gap`, `--head-room`, `--step`). Change a token, never a selector in a template.
 
-**Other factual constraints.** Hugo 0.166.0 pinned in CI; `pagerSize = 10`; goldmark `unsafe = true`; one known theme-owned deprecation warning (`.Site.LanguageCode`) that this design accepts rather than vendoring `baseof.html`; Hugo also emits `/en/…` aliases that must be left alone; no subscribe UI — RSS is not enabled in `hugo.toml`, though `/zh/index.xml` exists and can be subscribed directly.
+**Other factual constraints.** Hugo 0.166.0 pinned in CI; `pagerSize = 10`; goldmark `unsafe = true`; the build reports no deprecation warnings, because the shell is this repo's own `layouts/_default/baseof.html`; Hugo also emits `/en/…` aliases that must be left alone; no subscribe UI — RSS is not enabled in `hugo.toml`, though `/index.xml` and `/zh/index.xml` exist and can be subscribed directly.
 
 **Resolved by the author.**
-- **Replacing the theme is permitted.** hugo-paper 6.30 and the three vendored layouts are the incumbent implementation, not a protected asset; an authored visual world may replace them. What must survive any such replacement unchanged: the bilingual wiring (ADR 0001, explicit switch, `translationKey` pairs on both sides, tag links under `/zh/`, `lang="zh"` and Chinese dates), the social links, the article content, and what `scripts/i18n-smoke.sh` guarantees. Replacement is a decision taken when a redesign is actually requested, and is never a licence to touch the wiring.
+- **Theme replacement — taken.** The bilingual printed edition described in `DESIGN.md` replaced hugo-paper's visual world; no theme template renders. What the replacement was never allowed to touch, and did not: the bilingual wiring (ADR 0001, explicit switch, `translationKey` pairs on both sides, tag links under `/zh/`, `lang="zh"` and Chinese dates), the social links, the article content, and what `scripts/i18n-smoke.sh` guarantees. Permission to replace a theme is never a licence to touch the wiring.
 - **`/zh/` site chrome must be localized.** `title`, `description` and `bio` under `[languages.zh]` in `hugo.toml` are to be filled in so the Chinese edition stops inheriting the English values. This is authored Chinese copy in the author's own voice — not a translation of English site text — and it obeys the 保留原文 rule.
 
 **Out of scope for now — deferred by the author, not gaps to fill.**
-- Translating the remaining 14 English originals. Later work. In the meantime an Untranslated post stays a legal, permanent state, and no UI may present one as incomplete or count it as progress owed.
+- Translating the remaining 14 Untranslated posts. Later work. In the meantime an Untranslated post stays a legal, permanent state, and no UI may present one as incomplete or count it as progress owed.
 - Subscribe / RSS affordances. Not a priority; no subscribe UI is to be built, promised, or implied.
 - The Chinese tag name for `Skill` remains the author's call (`docs/zh.md`).
 
@@ -73,13 +73,14 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 
 - Name: **Lotp's Blog** / "Lotp"; author handle **lotp**; bio **"Every Day in Life Is a First Time"**; avatar `https://blog.lotp.xyz/portrait.jpeg`.
 - Voice: first-person, practical, technically specific. The author writes and translates every article by hand; nothing on the site is machine-authored.
-- Identity base today: hugo-paper 6.30, with the site's own `assets/custom.css` overrides. The name, bio, avatar and the three social links carry product weight — they are how the personal-brand purpose is delivered — and are binding in any future design. The theme itself is not binding.
+- Identity base: the site's own templates plus `assets/custom.css` — the bilingual printed edition documented in [DESIGN.md](./DESIGN.md). The name, bio, avatar and the three social links carry product weight — they are how the personal-brand purpose is delivered — and are binding in any future design. hugo-paper is installed for strings and icons only; it is not the identity.
 - `CONTEXT.md` is the authoritative vocabulary; its definitions and `_Avoid_` lists carry into any future copy or UI text.
 
 ## Evidence on Hand
 
-- 16 published English originals dated 2016-08 through 2026-09 in `content/posts/` (LeetCode solutions, TDD with async/await, iframe/postMessage in React, Redux style, Meteor, Linux disk cloning, spaced-repetition algorithm, reading notes, coding-agent + Notion workflow).
-- 2 hand-authored Chinese pairs: `I-Let-My-Coding-Agent-Manage-My-Notion-Tasks.zh.md`, `i18n-smoke-test.zh.md` (the latter is a draft fixture, never published).
+- 15 published English originals dated 2016-08 through 2026-09 in `content/posts/` (16 files, one of which is the draft fixture) (LeetCode solutions, TDD with async/await, iframe/postMessage in React, Redux style, Meteor, Linux disk cloning, spaced-repetition algorithm, reading notes, coding-agent + Notion workflow).
+- 1 published Chinese counterpart: `I-Let-My-Coding-Agent-Manage-My-Notion-Tasks.zh.md`, paired with its Original. The second pair, `i18n-smoke-test.md` + `.zh.md`, is a draft fixture that never publishes.
+- Counts that may appear on the site and their true values: 15 published Originals, 1 published Author translation, 14 Untranslated posts, 2 languages, first entry 2016-08-29.
 - Real media: `static/images/notion-agent-cover.jpg`, `static/images/demo-video/demo.gif`, `static/images/swipteToDelete.gif`, `static/images/2018/08/learnFast.jpg`, `static/images/2020/superEggDrop/cover.png`, `static/images/iframePostmessge.gif`.
 - Written decisions and tooling: `CONTEXT.md`, `docs/adr/0001-hugo-i18n-with-zh-language-key.md`, `docs/zh.md`, `docs/scripts.md`, `scripts/` (4 scripts), `.github/workflows/deploy.yml`.
 
@@ -97,4 +98,4 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 
 No formal standard is required — the author asked for the ordinary baseline, which here means: readable contrast in both light and dark mode, keyboard-operable controls, real `alt` text on post images, visible focus, and a layout that works on a phone with no hover available.
 
-Known existing friction: on mobile the social links, the language switch and the dark-mode toggle all sit inside the menu overlay, so toggling dark mode takes two taps. The Chinese edition additionally depends on correct `lang="zh"` and Chinese date formatting, which the smoke check guards.
+Formerly known friction, now resolved by the current design: the header controls used to collapse into a menu overlay on a phone, so dark mode took two taps; they are in the running head at every width now. What still has to stay correct is the Chinese edition's `lang="zh"` and Chinese date formatting, which the smoke check guards.

@@ -188,14 +188,15 @@ FAIL  test fixture pair exists (content/posts/i18n-smoke-test.md + .zh.md) — r
 | Check | Usual cause |
 | --- | --- |
 | `chinese pages declare lang="zh"`, dates not Chinese | `[languages.zh] locale` missing or renamed in `hugo.toml` |
-| `chinese tag links stay under /zh/` | the vendored `layouts/_default/single.html` lost its `absLangURL`, or the theme copy overwrote it |
+| `chinese tag links stay under /zh/` | a `tags/` link in one of this site's templates was built with `absURL` instead of `absLangURL` |
 | `a paired … post shows the language switch` | `translationKey` gone from the fixture, or the header no longer calls the partial |
 | `every real pair renders the switch in BOTH directions` | `translationKey` missing from the English original of a real post (the fixture cannot catch this: it has its key on both files) |
 | `header order: …` | the switch or the dark-mode toggle moved, or the header `<script>` moved back above the nav |
 | `hugo.toml uses no deprecated keys` | a `languageCode` / `languageName` came back in the config |
 
-The `NOTE` line is not a failure: it is the theme's own `.Site.LanguageCode` usage,
-explained in [zh.md → Known warnings](./zh.md#known-warnings).
+The `NOTE` line is not a failure: it reports a deprecation coming from theme templates rather
+than from this site's config. The build currently reports none — see
+[zh.md → Known warnings](./zh.md#known-warnings) for what it means if one comes back.
 
 ---
 

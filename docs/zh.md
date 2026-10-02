@@ -38,25 +38,28 @@ and `scripts/i18n-smoke.sh` fails the deploy on it. This is the single easiest w
 ## What Hugo does for free
 
 Once the language and the pair exist: `lang="zh"` on the HTML, Chinese dates (`2026年3月1日`),
-the theme's own Chinese pagination strings (上一页 / 下一页), `/zh/index.xml`, a sitemap listing
-both languages, `hreflang` alternates on paired pages, and a language switch in the header
-nav, after the social icons — `中文` on English pages, `English` on Chinese ones. The
-header row therefore reads: social icons → language switch → dark-mode toggle. On mobile all
-of them live in the menu overlay, so the dark-mode toggle now takes two taps on a phone.
+the theme's own Chinese pagination strings (上一页 / 下一页 — the reason `hugo-paper` is still
+installed), `/zh/index.xml`, a sitemap listing both languages, `hreflang` alternates on paired
+pages, and a language switch in the running head, after the profile links — `中文` on English
+pages, `English` on Chinese ones. The running head therefore reads: profile links → language
+switch → dark-mode dial, at every width including a phone. There is no menu to open, so the
+dark-mode dial is one tap on a phone.
 
 The switch renders **only where a counterpart exists**: an untranslated post shows no `中文`
 link at all. Reach the Chinese edition from such a post through `/zh/`.
 
-Site chrome for Chinese is yours to write: `title` and `params` placeholders for `/zh/` are
-commented out in `hugo.toml` under `[languages.zh]`. Until you fill them, Chinese pages
-inherit the English values.
+Site chrome for Chinese is authored in `hugo.toml` under `[languages.zh]`: `title`,
+`params.bio` and `params.description` are the Chinese edition's own wording, drafted for the
+author's approval. It is site chrome, not a translation of any article — replace any line you
+would not write yourself. Without those keys, Chinese pages inherit the English values.
 
 ## Tags
 
 Chinese posts use Chinese tags, and their tag links point at `/zh/tags/…`. That only works
-because `layouts/_default/single.html` is a vendored copy of the theme's with
-`absURL "tags/"` changed to `absLangURL "tags/"` — upstream, a Chinese post's tags would
-point at the English tag pages and 404.
+because every tag link in this site's own templates is built with `absLangURL "tags/"` —
+`layouts/_default/single.html`, `layouts/partials/record-row.html`,
+`layouts/partials/index-rail.html`. With `absURL`, a Chinese post's tags would point at the
+English tag pages and 404.
 
 Proposed tag names (the author owns this list; keep it short and consistent — every new
 spelling of a tag creates a second tag page):
@@ -115,76 +118,76 @@ It depends on a draft fixture pair, `content/posts/i18n-smoke-test.md` and
 `i18n smoke check` step in `.github/workflows/deploy.yml` too. Full check list and a
 trouble table: [scripts.md → i18n-smoke.sh](./scripts.md#scriptsi18n-smokesh--prove-the-wiring-still-works).
 
-## Vendored layout files (the maintenance cost of this design)
+## The templates and the stylesheet (what the design is made of)
 
-Two layout files are copies of the theme's, with deliberate changes:
+No template from `hugo-paper` renders any more. The markup and the whole visual world are the
+site's own:
 
-| File | Why it is vendored |
+| File | What it owns |
 | --- | --- |
-| `layouts/_default/list.html` | predates the Chinese edition (post list layout) |
-| `layouts/_default/single.html` | `absLangURL` tag links |
-| `layouts/partials/header.html` | language switch after the social icons, dark-mode toggle after that, and the header `<script>` moved below them |
+| `layouts/_default/baseof.html` | the shell: pre-paint edition script, header, `<main class="sheet page">`, colophon |
+| `layouts/partials/head.html` | requests **one** stylesheet, `assets/custom.css`, concatenated to `main.css` and fingerprinted |
+| `layouts/partials/header.html` | the running head: profile links → language switch → dark-mode dial, then the script that wires the dial |
+| `layouts/_default/list.html`, `layouts/partials/{records,ledger,record-row,index-rail}.html` | the title page, the contents ledger, the technique index, pagination |
+| `layouts/_default/single.html` | a record: running head, meta rule, body, facing pair, earlier/later |
+| `layouts/404.html` | the page printed when a record is not there |
+| `assets/custom.css` | every colour, rule, measure, spacing rhythm, state and movement. Nothing else styles this site |
 
-Before updating `hugo-paper`, diff them and re-apply the intended changes by hand:
-
-```sh
-diff themes/hugo-paper/layouts/_default/single.html layouts/_default/single.html
-diff themes/hugo-paper/layouts/_default/list.html  layouts/_default/list.html
-diff themes/hugo-paper/layouts/partials/header.html layouts/partials/header.html
-```
-
-The smoke check exists because this is the fragile part of the design: a theme update that
-reintroduces `absURL "tags/"`, or a vendored copy that quietly loses a change, otherwise
-looks like a healthy build.
+`hugo-paper` stays installed for two things only: its i18n files (`prev_page` / `next_page`
+and the rest of the Chinese chrome strings Hugo looks up by language key) and its static
+assets (the social icon set, favicon). A theme update that rewrites `themes/hugo-paper/layouts/`
+cannot change what this site renders, so the old ritual — diff each vendored copy before
+updating the theme, re-apply the intended changes by hand — is gone. What the smoke check
+protects instead is the wiring in the project's own files: `absLangURL` tag links, the
+language switch only where a twin exists, and the control order in `header.html`.
 
 One trap worth knowing: in a content template such as `single.html`, **nothing may render
 outside the `define` blocks**. A plain HTML comment at the top of the file makes Hugo drop
 every post page silently — 15 articles vanish, zero errors. Use a Hugo comment
 (`{{- /* … */ -}}`) inside the template instead, or put notes here.
 
-A second trap lives in the vendored `header.html`: its inline `<script>` does
-`document.querySelector('.btn-dark')`, so it must appear **after** the dark-mode toggle in
-document order. That script sits at the bottom of `<header>` for that reason. Move it back
-above the nav and the dark-mode button stops working, with nothing in the build log to tell
-you.
+A second trap lives in `header.html`: the inline `<script>` that wires the dark-mode dial looks
+the control up by selector, so it must appear **after** it in document order. That script sits
+at the bottom of the running head for that reason. Move it above the controls and the dial
+stops working, with nothing in the build log to tell you. (`baseof.html` also runs a script
+before paint, which applies the stored edition so a night reader never sees a flash of paper
+first. Both are asserted by `scripts/i18n-smoke.sh`.)
 
 ## Header spacing
 
-The social icons, the language switch and the dark-mode toggle are spaced by one value in
+The profile links, the language switch and the dark-mode dial are spaced by one value in
 `assets/custom.css`:
 
 ```css
 :root { --nav-gap: 0.75rem; }
 ```
 
-That file replaces hugo-paper's placeholder `assets/custom.css` (Hugo's project assets win),
-and it cancels the theme's `space-x-10` between icons plus the `lg:ml-14` / `lg:ml-10`
-group offsets — which is why the theme's class list still mentions them while the rendered
-gaps are equal. The overrides need `!important` because Tailwind v4 compiles those utilities
-at specificity (0,4,0). Change `--nav-gap` and nothing else. The smoke check fails if the
-rule stops shipping, which is what deleting the file would do.
+`assets/custom.css` is the site's only stylesheet: `layouts/partials/head.html` asks for it and
+nothing else, so the theme's compiled Tailwind is not loaded by any page and there is no
+utility class to fight. Change `--nav-gap` and nothing else. `scripts/i18n-smoke.sh` fails if
+the token stops shipping in the built CSS, which is what deleting the file would do.
 
 ## Known warnings
 
-`hugo` reports one deprecation this site does not control:
+`hugo` reports none. The one this site used to carry —
 
 ```
 WARN deprecated: .Site.LanguageCode was deprecated in Hugo v0.158.0 … Use .Site.Language.Locale instead.
 ```
 
-It comes from the theme's `layouts/_default/baseof.html`, not from `hugo.toml`. It is
-harmless today. Silencing it means vendoring `baseof.html` too, which this design
-deliberately avoids; the smoke check reports it as a note and fails only on
-config-level deprecations.
+came from the theme's `layouts/_default/baseof.html`, which stopped rendering when the shell
+became `layouts/_default/baseof.html` in this repo. If a theme-template deprecation ever comes
+back, `scripts/i18n-smoke.sh` prints it as a NOTE (it fails only on config-level deprecations)
+and the first thing to check is whether a theme template is being rendered again.
 
 ## Two things that are not what they look like
 
 - Hugo also emits English pages under `/en/…` (aliases of `/…`). They are redirects with a
   canonical link; leave them alone.
-- There is no subscribe UI. RSS is not enabled in `hugo.toml`, but `/zh/index.xml` exists
-  and can be subscribed directly. If you ever enable the theme's RSS icon, change its
-  `index.xml | absURL` to `absLangURL` in the vendored header first — as written it points
-  Chinese readers at the English feed.
+- There is no subscribe UI. RSS is not enabled in `hugo.toml`, but `/index.xml` and
+  `/zh/index.xml` are generated and can be subscribed directly. If a subscribe control is ever
+  added to the running head or the colophon, its feed link must be built with
+  `absLangURL "index.xml"`: written as `absURL`, it points Chinese readers at the English feed.
 
 ## Adding Traditional Chinese later
 

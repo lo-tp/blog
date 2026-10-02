@@ -1,0 +1,110 @@
+{
+  "title": "Choose the visual world",
+  "question": "The roll assigned The Problem Book (问题集). Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "The Problem Book",
+      "kicker": "THE ROLL",
+      "lineage": "competition problem sets and solution notebooks, indexed by technique",
+      "thesis": "The blog is a bound problem book: the index and the dated ledger ARE the page. A record is found by technique and by year, and a translation pair is a catalogue cross-reference rather than a language menu.",
+      "palette": ["#eef1ee", "#14181b", "#1d4e89", "#c2352b"],
+      "materials": ["ruled ledger", "index card", "tabular numerals", "red pen"],
+      "viewport": "The book's opening spread, not a hero. A masthead band sets LOTP in condensed caps beside a front-matter line (engineering notes · 2016 → 2026 · written and translated by hand). The left column is the index: techniques with counts, and a year spine 2016 … 2026 that jumps the ledger. The right column is the ledger itself — records grouped under year markers, each row numbered, dated, tagged, and marked 中 only where a twin exists.",
+      "risk": "A ledger of text can read cold. If the masthead is timid and the index sparse this becomes a database instead of a book, and there is no imagery to hide behind.",
+      "raised": [
+        { "from": "Cyclorama Dawn", "raise": "Every state is named in text and never carried by colour alone: 当前 / current, 已配对 / paired with its Original, 暂无中文 / no Chinese twin." },
+        { "from": "Deployable Curved Shell", "raise": "On narrow screens the plan travels with the section: a slim sticky index bar sits above the ledger instead of the index hiding behind a menu." },
+        { "from": "Hatch Show Print", "raise": "Total commitment to a fixed ink set, with one ink reserved for exactly one thing — red only ever marks the record you are on." },
+        { "from": "Arcade Cabinet", "raise": "State changes land in whole steps: nothing half-faded or half-open, and prefers-reduced-motion is honoured as the same states without motion." }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Facing Pages",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Loeb-classical facing-page editions and 中英对照 technical translations",
+      "thesis": "The site is a bilingual edition printed in two columns: every record carries its translation beside it, and the language is a column, not a dropdown.",
+      "palette": ["#f2f3f4", "#1a1a1f", "#2f5d8a", "#7c3a2c"],
+      "materials": ["facing pages", "running heads", "parallel columns"],
+      "viewport": "The home page is a table of contents printed in two columns — Original left, 中文 right — entries joined by a rule, with the pair's shared number in the gutter.",
+      "risk": "This is where a bilingual blog most obviously lands, and the honest count works against it: 1 of 15 records has a twin, so a facing-page law exposes 14 empty halves and risks making an Untranslated post look incomplete, which this product forbids.",
+      "case": "My top-ranked grounded candidate. Stronger on the pairing mechanism than the assigned direction; weaker on the answer-first index the primary reader came for."
+    },
+    {
+      "id": "challenger-vertical-feed",
+      "label": "Vertical Feed Surface",
+      "verdict": "competitive",
+      "lineage": "short-video feeds — TikTok, Reels, Shorts",
+      "thesis": "Each record owns a whole viewport; a right rail of actions; the next record is one snap away and already loaded.",
+      "palette": ["#0b0b0c", "#ffffff", "#f2f2f2"],
+      "materials": ["media bleed", "bottom scrim", "glyph rail"],
+      "case": "Fuses cleanly on audience identification — every reader here lives inside a vertical feed all day — and fails on product clarity: a decade of text records needs ten rows in view at once, and this site's GIFs illustrate arguments rather than being the content.",
+      "kept": "The next record is already resolved and waiting: prev/next named by title at the end of every article, never an anonymous arrow back to the list.",
+      "risk": "A media-first shell wearing a text-first record.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-vertical-video-feed-surface-hero.webp"
+    },
+    {
+      "id": "challenger-collider-display",
+      "label": "Collider Event Display",
+      "verdict": "competitive",
+      "lineage": "particle-physics event displays — detector cross-sections, calorimeter wedges",
+      "thesis": "One record as a collision: its tags are tracks radiating outward; pick a track and everything else dims.",
+      "palette": ["#0d1117", "#7f9db8", "#ffd23f", "#e5484d"],
+      "materials": ["concentric rings", "track isolation", "confidence as line weight"],
+      "case": "Holds product clarity — isolate-one-tag-and-dim-the-rest is precisely what a tag page should do, and writing confidence as line weight is honest — but loses audience identification (a physicist's instrument, not an engineer's reading material) and would give a long-form text site a dark instrument ground.",
+      "kept": "Isolate-and-dim on tag pages: the current technique solid and labelled in text, the other techniques present but dimmed — never dimmed colour alone.",
+      "risk": "Instrument-ground darkness under long reading.",
+      "hero": "https://impeccable.style/worlds/cards/scientific-notation-particle-detector-event-display-hero.webp"
+    },
+    {
+      "id": "challenger-cyclorama",
+      "label": "Cyclorama Dawn",
+      "verdict": "declined",
+      "lineage": "theatre cyclorama lighting plots",
+      "case": "Fuses poorly: a blog has no atmospheric phases, so light-as-structure would decorate a text record.",
+      "kept": "Named states with text-equivalent labels — colour is never the sole signal."
+    },
+    {
+      "id": "challenger-curved-shell",
+      "label": "Deployable Curved Shell",
+      "verdict": "declined",
+      "lineage": "a single curved crease folding a flat sheet into a rigid shell",
+      "case": "Fuses poorly: one sweeping arc as the compositional law breaks a ledger built for scanning.",
+      "kept": "Plan and section paired on small screens."
+    },
+    {
+      "id": "challenger-hatch-show",
+      "label": "Hatch Show Print",
+      "verdict": "declined",
+      "lineage": "letterpress gig broadsides, wood type in full-width bands",
+      "case": "Fuses poorly: bands forced to fill the measure make a poster, not an index an engineer scans for an answer.",
+      "kept": "A fixed ink set with one ink reserved for one thing."
+    },
+    {
+      "id": "challenger-arcade",
+      "label": "Arcade Cabinet",
+      "verdict": "declined",
+      "lineage": "pixel-art arcade screens, scanlines and phosphor bloom",
+      "case": "Fuses poorly: a tile grid and a pixel face tax a reading surface, and the subject's work is not a game screen.",
+      "kept": "Whole-step state changes, no half-finished transitions."
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": false
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "The Reading Blog, Done Well",
+    "thesis": "The category standard for a personal engineering blog — identity block, clean chronological list, one reading column — executed at full craft.",
+    "palette": ["#ffffff", "#111318", "#2f6fed"],
+    "materials": ["single column", "clear list", "one accent"],
+    "viewport": "The arrangement every visitor already knows: identity at the top, a chronological list of titles, a calm article column.",
+    "risk": "It is close to what this site is today — safe, familiar, indistinguishable from a good Hugo blog. That is exactly what you asked to leave."
+  },
+  "steer": true
+}
