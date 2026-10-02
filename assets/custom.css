@@ -470,11 +470,13 @@ html.dark .btn-dark .shade {
   padding-bottom: var(--g-3);
 }
 
+/* The masthead band prints tight against the masthead: the bio line alone. */
 .imprint {
   justify-self: end;
   text-align: right;
   display: grid;
-  gap: 0.3rem;
+  gap: 0;
+  margin-top: calc(-1 * var(--g-2));
 }
 
 .imprint p {
@@ -487,15 +489,10 @@ html.dark .btn-dark .shade {
   white-space: nowrap;
 }
 
-.imprint .imprint__bio {
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 0.95rem;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ink);
-  white-space: normal;
-  max-width: 34ch;
+/* The masthead profile glyphs sit at the sheet's right edge, matching the
+   running head's drawn icons. */
+.imprint .social {
+  justify-content: flex-end;
 }
 
 /* ----------------------------------------------------------------------------
@@ -506,7 +503,7 @@ html.dark .btn-dark .shade {
   display: grid;
   grid-template-columns: var(--measure-index) 1fr;
   gap: clamp(2rem, 4vw, 3.5rem);
-  padding-top: var(--g-4);
+  padding-top: var(--g-3);
   align-items: start;
 }
 
@@ -719,7 +716,9 @@ html.dark .btn-dark .shade {
    7. Contents ledger
    --------------------------------------------------------------------------- */
 
-.contents {
+/* In the spread the ledger has no title and no rule above it. A standalone
+   contents section — the /tags/ index — keeps the rule. */
+.contents:not([id]) {
   border-top: 2px solid var(--ink);
   padding-top: 0.9rem;
 }
@@ -742,6 +741,13 @@ html.dark .btn-dark .shade {
 .year {
   margin-top: var(--head-room);
   scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+/* The ledger prints flush at the top of the spread: the first year group
+   takes no reserved head-room, so it starts level with the index rail.
+   Later groups keep the --head-room rhythm. */
+.contents > .year:first-of-type {
+  margin-top: 0;
 }
 
 .year__rows {
@@ -1448,7 +1454,6 @@ html.dark .btn-dark .shade {
      column, and never hidden behind a menu. The full index is always one link
      away at /tags/, so the strip can stay short. */
   .index .index__block--author,
-  .index .index__title--full,
   .index .index__singles {
     display: none;
   }

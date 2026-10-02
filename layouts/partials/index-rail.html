@@ -18,7 +18,6 @@
 
 <nav class="index" {{- if $currentKey -}} data-isolated="true" {{- end -}} aria-label="{{- i18n "chrome_index" -}}">
   <div class="index__block">
-    <h2 class="index__title index__title--full">{{ i18n "chrome_techniques" }}</h2>
     <ul class="index__list">
       {{- range $techs -}}
       <li>
@@ -86,7 +85,9 @@
           {{- if site.Params.linkedin -}}
           <li>
             <a href="https://www.linkedin.com/in/{{- site.Params.linkedin -}}" target="_blank" rel="me noopener">
-              <span>LinkedIn</span><span>{{- site.Params.linkedin -}}</span>
+              <span>LinkedIn</span>{{- /* Displayed handle: the name only — the
+                LinkedIn id suffix is stripped and the slug is printed title-cased.
+                The URL above stays built from the full slug. */ -}}<span>{{- site.Params.linkedin | replaceRE "-[0-9a-f]{6,}$" "" | replaceRE "-" " " | title -}}</span>
             </a>
           </li>
           {{- end -}}

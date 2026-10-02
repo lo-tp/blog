@@ -119,7 +119,7 @@ const PROBE = () => {
     return value.includes('rem') ? Math.round(n * 16) : Math.round(n);
   };
 
-  const social = [...document.querySelectorAll('.social a')].map((a) => a.getBoundingClientRect());
+  const social = [...document.querySelectorAll('.running-head .social a')].map((a) => a.getBoundingClientRect());
   const socialBoxes = social.map((b) => ({ x: +b.x.toFixed(0), right: +b.right.toFixed(0), y: +b.y.toFixed(0) }));
   const lang = box('.lang-switch a') || box('.lang-switch');
   const dial = box('.btn-dark');
@@ -147,7 +147,7 @@ const PROBE = () => {
     controls: {
       social: socialBoxes.length,
       socialRightMost: socialBoxes.length ? Math.max(...socialBoxes.map((b) => b.right)) : null,
-      socialLabelSpill: socialBoxes.length < social.length ? 'n/a' : [...document.querySelectorAll('.social a')].filter((a) => a.scrollWidth > a.clientWidth + 1).length,
+      socialLabelSpill: socialBoxes.length < social.length ? 'n/a' : [...document.querySelectorAll('.running-head .social a')].filter((a) => a.scrollWidth > a.clientWidth + 1).length,
       lang,
       dial,
       orderIsProfileThenLangThenDial: ascending,

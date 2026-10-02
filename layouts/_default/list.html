@@ -1,9 +1,9 @@
 {{- /*
   list.html — home, sections, technique pages, and the full technique index.
 
-  Home is the edition's title page: the masthead, the imprint line, then the
-  spread — the plan on the left (techniques with counts, the year spine, the
-  author), the contents ledger on the right.
+  Home is the edition's title page: the masthead, then the spread — the plan
+  on the left (techniques with counts, the year spine, the author), the
+  contents ledger on the right.
   A technique page is the same ledger with one technique marked, in the
   author's own spelling of it, not Hugo's lowercased taxonomy key.
   /tags/ is the index on its own, every technique counted.
@@ -15,20 +15,29 @@
 {{- $index := $techs | append $singles -}}
 
 {{- if .IsHome -}}
-{{- $span := .Scratch.Get "span" -}}
 <header class="frontmatter">
   <h1 class="masthead">
     <a href="{{ "/" | absLangURL }}">{{ site.Params.name | default site.Title }}</a>
   </h1>
   <div class="imprint">
-    {{- if and $span.from $span.to -}}
-    <p>{{ i18n "chrome_engineering_notes" }} · {{ $span.from }} → {{ $span.to }}</p>
-    {{- else -}}
-    <p>{{ i18n "chrome_engineering_notes" }}</p>
-    {{- end -}}
-    <p>{{ i18n "chrome_imprint" }}</p>
-    {{- with site.Params.bio -}}
-    <p class="imprint__bio">{{ . }}</p>
+    {{- /* Masthead profile glyphs: the same drawn icon set and accessible-name
+      idiom as the running head, printed where the bio line used to sit. */ -}}
+    {{- $services := slice -}}
+    {{- if site.Params.github -}}{{- $services = $services | append (dict "id" "github" "label" "GitHub" "href" (print "https://github.com/" site.Params.github)) -}}{{- end -}}
+    {{- if site.Params.twitter -}}{{- $services = $services | append (dict "id" "twitter" "label" "X" "href" (print "https://x.com/" site.Params.twitter)) -}}{{- end -}}
+    {{- if site.Params.linkedin -}}{{- $services = $services | append (dict "id" "linkedin" "label" "LinkedIn" "href" (print "https://www.linkedin.com/in/" site.Params.linkedin)) -}}{{- end -}}
+    {{- with $services -}}
+    <nav class="social" aria-label="{{- i18n "chrome_profile" -}}">
+      {{- range . -}}
+      <a
+        data-social="{{- .id -}}"
+        style="--url: url({{- printf "%s.svg" .id | absURL -}})"
+        href="{{- .href -}}"
+        target="_blank"
+        rel="me noopener"
+      >{{- .label -}}</a>
+      {{- end -}}
+    </nav>
     {{- end -}}
   </div>
 </header>

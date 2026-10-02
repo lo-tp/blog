@@ -28,8 +28,7 @@
 {{- $counts = merge $counts (dict $y (add $have 1)) -}}
 {{- end -}}
 
-<section class="contents" id="contents">
-  <h2 class="contents__title">{{- i18n "chrome_contents" -}}</h2>
+<section class="contents" id="contents" aria-label="{{- i18n "chrome_contents" -}}">
 
   {{- range $y := $years -}}
   <div class="year" id="y{{- $y -}}">
