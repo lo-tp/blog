@@ -196,7 +196,10 @@ for prose, the sans for headings.
   scale for one component; the title page is not set larger than the page it heads.
 - **Record Title** (700, clamp(1.7rem, 3.6vw, 2.3rem), lh 1.16): the h1 of one record.
 - **Ledger Title** (700, 1.3rem, lh 1.4): a row's title in the contents ledger.
-- **Body** (400, 17px, lh 1.7): article prose, 57ch measure (≈75 characters per line).
+- **Body** (400, 17px, lh 1.7): article prose, a 610px measure (≈75 characters per line in the
+  Latin face). The Chinese edition sets the same 610px column: one record, two languages, one page
+  width. Songti at 17px puts ≈41 characters on that line — wider than Chinese is usually set at,
+  accepted deliberately rather than left to a token that quietly differed.
 - **Label** (600, 0.72rem, tracked 0.16em, capitals): the edition's label voice — `Contents`,
   `All techniques`, `Earlier record`, named states. Short strings only.
 - **Meta / Folio** (500–600, 0.75–0.8rem, tracked 0.05em, tabular figures): dates, counts,
@@ -225,7 +228,8 @@ from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
   the **contents ledger** on the right, grouped by a **year spine** (`6.2rem` folio column +
   titles). Every row is the same: date column plus one title, whether or not the record is
   paired.
-- **Record pages** set one text block, `max-width: 57ch`, centred between the sheet margins.
+- **Record pages** set one text block, `max-width: 610px`, centred between the sheet margins — the
+  same width in both editions, because a Translation pair should read as one page in two languages.
   The edition switch and the earlier/later pair print inside the same measure.
 - **Rhythm is one scale.** `--g-1 … --g-5` (0.5 / 1 / 1.5 / 2.5 / 4rem), plus `--head-room:
   2.75rem` above a heading, `--head-room-after: 0.85rem` below it, `--row-gap: 1.9rem` between
@@ -323,3 +327,6 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
   titles hold full contrast at every scroll position.
 - **Don't** invent evidence: no testimonial, no count, no badge that the author has not written.
 - **Don't** hide a control behind a menu on a phone.
+- **Don't** size a measure in `ch`. A `ch` is the width of a glyph in whichever face the element
+  happens to set, so one token produced a 610px English record and a 454px Chinese one — the same
+  post, two page widths. Measures are lengths.
