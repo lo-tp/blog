@@ -30,7 +30,7 @@ Every article is something the author personally did, published with the artifac
 
 The second language is authored, not generated. Each Chinese article is hand-translated and explicitly paired with its Original; the tooling only makes the pairing possible and reports its state honestly (drift is surfaced, never assumed away). No article body is ever produced automatically.
 
-Its decisions are written down as durable artifacts: `CONTEXT.md` owns the vocabulary, `docs/adr/` owns the architecture calls, `docs/zh.md` and `docs/scripts.md` own the maintenance cost, and a CI smoke check fails the deploy when the bilingual wiring quietly breaks.
+Its decisions are written down as durable artifacts: `CONTEXT.md` owns the vocabulary, `docs/adr/` owns the architecture calls, `docs/zh.md` and `docs/scripts.md` own the maintenance cost. No check runs in CI: what quietly breaks is caught by reading the pages, and `docs/zh.md` lists what to look for.
 
 A search-farm article, a machine-mirrored bilingual site, or agent-hype commentary could not truthfully copy any of those three — and the personal-brand impression the site produces depends on all three at once: a decade of the same person's decisions, in his own handwriting, in two languages, with the tooling and the reasoning left visible.
 
@@ -39,8 +39,8 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 ## Operating Context
 
 - Articles are Markdown in `content/posts/`, one file per language, paired by `translationKey` on **both** files.
-- Local work: `./hugo server` (English at `:1313/`, Chinese at `:1313/zh/`); `scripts/new-zh-post.sh` scaffolds a translation; `scripts/i18n-status.sh` reports what is left to do; `scripts/i18n-smoke.sh` proves the wiring; `scripts/measure-home-gap.sh` measures the rendered rhythm and the header control contract in a headless browser, and fails when the render disagrees with the stylesheet's own tokens.
-- Publishing: GitHub Actions builds with Hugo 0.166.0, runs the i18n smoke check **before** pushing, and publishes to `lo-tp/lo-tp.github.io`, served at `blog.lotp.xyz` (`static/CNAME`). `deploy.sh` is the manual equivalent.
+- Local work: `./hugo server` (English at `:1313/`, Chinese at `:1313/zh/`); `scripts/new-zh-post.sh` scaffolds a translation. Nothing else runs: no pairing report, no wiring check, no render measurement.
+- Publishing: GitHub Actions builds with Hugo 0.166.0 and publishes to `lo-tp/lo-tp.github.io`, served at `blog.lotp.xyz` (`static/CNAME`). `deploy.sh` is the manual equivalent.
 - Reading scenes: desktop browser and phone — the header band keeps its controls at every width, there is no menu to open — in both light and dark mode.
 - Existing materials: `static/images/` post images and GIFs, `static/portrait.jpeg`, robots.txt, and the self-hosted display face in `static/fonts/`. The visual world is documented in [DESIGN.md](./DESIGN.md).
 
@@ -61,7 +61,7 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 **Other factual constraints.** Hugo 0.166.0 pinned in CI; `pagerSize = 10`; goldmark `unsafe = true`; the build reports no deprecation warnings, because the shell is this repo's own `layouts/_default/baseof.html`; Hugo also emits `/en/…` aliases that must be left alone; no subscribe UI — RSS is not enabled in `hugo.toml`, though `/index.xml` and `/zh/index.xml` exist and can be subscribed directly.
 
 **Resolved by the author.**
-- **Theme replacement — taken.** The bilingual printed edition described in `DESIGN.md` replaced hugo-paper's visual world; no theme template renders. What the replacement was never allowed to touch, and did not: the bilingual wiring (ADR 0001, explicit switch, `translationKey` pairs on both sides, tag links under `/zh/`, `lang="zh"` and Chinese dates), the social links, the article content, and what `scripts/i18n-smoke.sh` guarantees. Permission to replace a theme is never a licence to touch the wiring.
+- **Theme replacement — taken.** The bilingual printed edition described in `DESIGN.md` replaced hugo-paper's visual world; no theme template renders. What the replacement was never allowed to touch, and did not: the bilingual wiring (ADR 0001, explicit switch, `translationKey` pairs on both sides, tag links under `/zh/`, `lang="zh"` and Chinese dates), the social links, and the article content. Permission to replace a theme is never a licence to touch the wiring.
 - **`/zh/` site chrome must be localized.** `title`, `description` and `bio` under `[languages.zh]` in `hugo.toml` are to be filled in so the Chinese edition stops inheriting the English values. This is authored Chinese copy in the author's own voice — not a translation of English site text — and it obeys the 保留原文 rule.
 
 **Out of scope for now — deferred by the author, not gaps to fill.**
@@ -79,7 +79,7 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 ## Evidence on Hand
 
 - 15 published English originals dated 2016-08 through 2026-09 in `content/posts/` (16 files, one of which is the draft fixture) (LeetCode solutions, TDD with async/await, iframe/postMessage in React, Redux style, Meteor, Linux disk cloning, spaced-repetition algorithm, reading notes, coding-agent + Notion workflow).
-- 1 published Chinese counterpart: `I-Let-My-Coding-Agent-Manage-My-Notion-Tasks.zh.md`, paired with its Original. The second pair, `i18n-smoke-test.md` + `.zh.md`, is a draft fixture that never publishes.
+- 1 published Chinese counterpart: `I-Let-My-Coding-Agent-Manage-My-Notion-Tasks.zh.md`, paired with its Original.
 - Counts that may appear on the site and their true values: 15 published Originals, 1 published Author translation, 14 Untranslated posts, 2 languages, first entry 2016-08-29.
 - Real media: `static/images/notion-agent-cover.jpg`, `static/images/demo-video/demo.gif`, `static/images/swipteToDelete.gif`, `static/images/2018/08/learnFast.jpg`, `static/images/2020/superEggDrop/cover.png`, `static/images/iframePostmessge.gif`.
 - Written decisions and tooling: `CONTEXT.md`, `docs/adr/0001-hugo-i18n-with-zh-language-key.md`, `docs/zh.md`, `docs/scripts.md`, `scripts/` (4 scripts), `.github/workflows/deploy.yml`.
@@ -98,4 +98,4 @@ Deliberately **not**: an SEO content farm, a marketing-style personal-brand page
 
 No formal standard is required — the author asked for the ordinary baseline, which here means: readable contrast in both light and dark mode, keyboard-operable controls, real `alt` text on post images, visible focus, and a layout that works on a phone with no hover available.
 
-Formerly known friction, now resolved by the current design: the header controls used to collapse into a menu overlay on a phone, so dark mode took two taps; they are in the header band at every width now. What still has to stay correct is the Chinese edition's `lang="zh"` and Chinese date formatting, which the smoke check guards.
+Formerly known friction, now resolved by the current design: the header controls used to collapse into a menu overlay on a phone, so dark mode took two taps; they are in the header band at every width now. What still has to stay correct is the Chinese edition's `lang="zh"` and Chinese date formatting; nothing checks them for you.

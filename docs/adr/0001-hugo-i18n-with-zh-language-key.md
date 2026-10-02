@@ -43,10 +43,10 @@ nothing in this layout blocks it.
   `partials/header.html` are vendored too (the language switch and the dark-mode toggle
   belong at the end of the header nav, and the header `<script>` must come after them, since
   it does `document.querySelector('.btn-dark')`), so three theme files are ours to diff
-  before an upgrade; the i18n
-  smoke check is what catches a quiet regression. The same class of bug as the tag links
+  before an upgrade. The same class of bug as the tag links
   exists for the theme's RSS icon; RSS stays off because no subscribe UI was asked for.
+  (Consequence, added later: the i18n smoke check that used to catch a quiet regression here
+  was removed. Nothing in the repo catches it now.)
 - **Translations are written by the author, never generated.** No article body is produced
-  by tooling; the scripts only scaffold a paired file, report which originals have no
-  counterpart, and report drift (a translation whose English original changed afterwards).
-  Drift is expected and reported, not hidden.
+  by tooling; the scripts only scaffold a paired file. Drift (a translation whose English
+  original changed afterwards) is expected and tolerated; it is no longer reported by a script.

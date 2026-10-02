@@ -12,8 +12,8 @@
 */ -}}
 {{- $main := site.Params.mainSections | default (slice "posts") -}}
 
-{{- /* Current language. Drafts are never part of the edition: the i18n smoke
-  fixture pair is built with --buildDrafts and must stay out of the ledger. */ -}}
+{{- /* Current language. Drafts are never part of the edition: a draft is work in
+  progress, not a record, and it must stay out of the ledger whatever builds it. */ -}}
 {{- $records := where site.RegularPages "Type" "in" $main -}}
 {{- $records = where $records "Draft" "eq" false -}}
 {{- $.Scratch.Set "records" $records -}}

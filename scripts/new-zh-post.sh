@@ -55,8 +55,9 @@ trap 'rm -f "$tmp" "$fm"' EXIT
 # --- translationKey on the English original -------------------------------------------
 # Pairing is read from the key, and Hugo resolves .Translations from BOTH sides. A key on
 # the .zh.md alone still renders the original's page, but the original never links back: no
-# `中文`-side twin, no hreflang="en", and i18n-status.sh's `unpaired` counter cannot see it,
-# because that check looks for a key on the translation only. So the key is ensured here.
+# `中文`-side twin, no hreflang="en". It builds clean and looks fine from the English side, so
+# nothing catches it later; the key is ensured on both files here, at the one moment it is cheap
+# to add.
 # The value used is whatever the original already declares; nothing else in the original is
 # touched (the file is rewritten only when the key is genuinely absent).
 if head -n "$fm_end" "$src" | grep -q '^translationKey:[[:space:]]*[^[:space:]]'; then
@@ -73,8 +74,7 @@ else
     sed -n "${fm_end},\$p" "$src"
   } > "$fm"
   # Preserve the original's mtime: a commit date for the original later than the translation
-  # is exactly what i18n-status.sh reports as drift, and a tool that scaffolds a translation
-  # should not manufacture it. `touch -t` takes [[CC]YY]MMDDHHMM[.SS], not an epoch, so the
+  # is drift, and a tool that scaffolds a translation should not manufacture it. `touch -t` takes [[CC]YY]MMDDHHMM[.SS], not an epoch, so the
   # epoch from stat is converted with date -r first.
   mepoch=$(stat -f %m "$src" 2>/dev/null || stat -c %Y "$src")
   mv "$fm" "$src"

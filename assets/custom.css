@@ -15,8 +15,9 @@
    long paragraphs stay readable. Ink is reserved for the record or technique the
    reader is currently on; blue is navigation only.
 
-   scripts/i18n-smoke.sh asserts that --nav-gap ships in the built CSS. It is
-   the header control gap and it stays here; the check fails if it disappears.
+   --nav-gap is the header control gap and it stays here. Nothing checks that it
+   ships in the built CSS: if this file stops being in the pipeline, the header's
+   spacing is what shows it.
    ============================================================================ */
 
 /* ----------------------------------------------------------------------------
@@ -84,7 +85,7 @@
   --mark: #b03f26;
   --on-plate: #e6e9ea;
 
-  --nav-gap: 0.75rem; /* asserted by scripts/i18n-smoke.sh */
+  --nav-gap: 0.75rem; /* the header control gap */
 
   --g-1: 0.5rem;
   --g-2: 1rem;

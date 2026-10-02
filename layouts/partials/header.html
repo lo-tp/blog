@@ -14,11 +14,11 @@
                         anywhere; the record's own title is printed by
                         single.html as the page's H1.
 
-  scripts/i18n-smoke.sh asserts the control order in the imprint row and the
-  script that wires the dial: profile links -> language switch -> dark-mode
-  toggle -> the script that finds the toggle. Keep them in this order, and keep
-  `class="btn-dark"` and `btnDark = document.querySelectorAll` intact — the
-  script must stay after the controls it wires.
+  The contract of this row is its order — profile links -> language switch ->
+  dark-mode toggle -> the script that finds the toggle — and the script's position
+  after the controls it wires. Keep `class="btn-dark"` and
+  `btnDark = document.querySelectorAll` intact. Nothing checks it: a reordered row
+  or a moved script builds clean and simply does not work.
 
   The icons resolve at the site root: `printf "%s.svg" .id | absURL`, not the
   theme's relative `./linkedin.svg`, which 404s on /tags/…/ pages.

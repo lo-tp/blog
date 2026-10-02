@@ -9,8 +9,9 @@
 
   labelled=true names each control in the apparatus voice and is the title
   page's setting; labelled=false is the inner-page header, where the masthead
-  already sets the row. scripts/i18n-smoke.sh asserts the order: language switch
-  -> dark-mode dial -> the script that wires the dial.
+  already sets the row. The order this partial emits — language switch ->
+  dark-mode dial — is what header.html's script then wires, so it must stay in
+  that order and stay before that script.
 */ -}}
 {{- if .labelled -}}
 <span class="edition-control">

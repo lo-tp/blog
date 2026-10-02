@@ -32,8 +32,9 @@ Keep unchanged: the filename (`<same-slug>.zh.md`), `translationKey`, `date`, `i
 **Without a `translationKey` on both files the two files are not a pair.** Hugo will happily
 build both, and a key on the translation alone will even make the English page show `中文` — but
 the Chinese page renders no switch back and no `hreflang="en"`, because Hugo resolves
-`.Translations` from both sides. `scripts/i18n-status.sh` reports that case as **one-sided keys**,
-and `scripts/i18n-smoke.sh` fails the deploy on it. This is the single easiest way to get it wrong.
+`.Translations` from both sides. This is the single easiest way to get it wrong, and nothing in
+the repo catches it for you: the build is clean and the English half looks fine. Check both files'
+front matter when a switch is missing in one direction.
 
 ## What Hugo does for free
 
@@ -81,43 +82,18 @@ spelling of a tag creates a second tag page):
 Code, commands, file paths, library and product names stay English inside Chinese prose. The
 proposed terminology for article text is in [CONTEXT.md](../CONTEXT.md).
 
-## Checking the state of the Chinese edition
+## Nothing checks this for you
 
-```sh
-scripts/i18n-status.sh
-```
+There is no build check, no pairing report and no render measurement in this repo: the CI job
+builds and publishes, and `scripts/new-zh-post.sh` is the only helper left. Everything below is a
+list of things that break **without a build error or a failing check** — the price of removing the
+checks is that reading the pages is what catches them.
 
-Informational, always exits 0. Full usage and how drift is measured:
-[scripts.md → i18n-status.sh](./scripts.md#scriptsi18n-statussh--see-what-is-left-to-do).
-Reports originals with no Chinese counterpart, orphan
-translations, translations missing a `translationKey`, **one-sided keys** (the key is on the
-translation but not on the original, so the switch renders in one direction only), and **drift** —
-a translation whose English original was committed later than the translation itself. Drift is
-expected; the point is that it is visible rather than assumed away.
-
-## The smoke check
-
-```sh
-scripts/i18n-smoke.sh                                    # locally
-HUGO_BIN=./hugo bash scripts/i18n-smoke.sh              # as CI runs it
-```
-
-Builds into a throwaway `.i18n-smoke.tmp` directory with drafts included and asserts: both
-languages build, Chinese pages declare `lang="zh"`, the Chinese feed exists, a paired post
-links to its twin in both directions, **every real pair in `content/posts/` renders the switch
-in both directions** (the fixture pair has its key on both files by construction, so on its own
-it could pass while a real post was half-paired), the header renders profile links → language
-switch → dark-mode toggle with the script after them, an unpaired post
-shows no switch, Chinese tag links
-stay under `/zh/`, dates render in Chinese, and `hugo.toml` uses no deprecated keys.
-
-CI runs it after the build and **before** pushing to GitHub Pages, so a broken wiring fails
-the deploy instead of surfacing as a 404 for a reader.
-
-It depends on a draft fixture pair, `content/posts/i18n-smoke-test.md` and
-`.i18n-smoke-test.zh.md`. Drafts are never published. If you delete the fixture, delete the
-`i18n smoke check` step in `.github/workflows/deploy.yml` too. Full check list and a
-trouble table: [scripts.md → i18n-smoke.sh](./scripts.md#scriptsi18n-smokesh--prove-the-wiring-still-works).
+- a `translationKey` on one side only (see above): the switch works in one direction.
+- a paired record whose row prints two titles, or a record that prints its twin's body beside
+  its own: the one-title-per-row rule broken.
+- a header whose controls overlap, wrap out of order, or a dial that does nothing when clicked.
+- Chinese pages that lost `lang="zh"`, Chinese dates, or `/zh/` tag links.
 
 ## The templates and the stylesheet (what the design is made of)
 
@@ -140,10 +116,10 @@ site's own:
 and the rest of the Chinese chrome strings Hugo looks up by language key) and its static
 assets (the social icon set, favicon). A theme update that rewrites `themes/hugo-paper/layouts/`
 cannot change what this site renders, so the old ritual — diff each vendored copy before
-updating the theme, re-apply the intended changes by hand — is gone. What the smoke check
-protects instead is the wiring in the project's own files: `absLangURL` tag links, the
-language switch only where a twin exists, the one-title-per-row ledger, and the control order in
-`header.html`.
+updating the theme, re-apply the intended changes by hand — is gone. What has to stay correct is
+the wiring in this project's own files: `absLangURL` tag links, the language switch only where a
+twin exists, the one-title-per-row ledger, and the control order in `header.html`. No check
+enforces them.
 
 One trap worth knowing: in a content template such as `single.html`, **nothing may render
 outside the `define` blocks**. A plain HTML comment at the top of the file makes Hugo drop
@@ -157,7 +133,7 @@ stops working, with nothing in the build log to tell you. The same script measur
 publishes the result as `--band-h`, which is what the sticky index rail and the `#y####` anchors
 offset from — the band's height is its own content, so nothing hardcodes it. (`baseof.html` also runs a script
 before paint, which applies the stored edition so a night reader never sees a flash of paper
-first. Both are asserted by `scripts/i18n-smoke.sh`.)
+first. Both are worth re-reading after any edit to the header.)
 
 ## Header spacing
 
@@ -170,8 +146,8 @@ one value in `assets/custom.css`:
 
 `assets/custom.css` is the site's only stylesheet: `layouts/partials/head.html` asks for it and
 nothing else, so the theme's compiled Tailwind is not loaded by any page and there is no
-utility class to fight. Change `--nav-gap` and nothing else. `scripts/i18n-smoke.sh` fails if
-the token stops shipping in the built CSS, which is what deleting the file would do.
+utility class to fight. Change `--nav-gap` and nothing else. If `assets/custom.css` stops being
+in the pipeline the token stops shipping and the header spacing is the first thing that shows it.
 
 ## Known warnings
 
@@ -183,8 +159,8 @@ WARN deprecated: .Site.LanguageCode was deprecated in Hugo v0.158.0 … Use .Sit
 
 came from the theme's `layouts/_default/baseof.html`, which stopped rendering when the shell
 became `layouts/_default/baseof.html` in this repo. If a theme-template deprecation ever comes
-back, `scripts/i18n-smoke.sh` prints it as a NOTE (it fails only on config-level deprecations)
-and the first thing to check is whether a theme template is being rendered again.
+back to `hugo`'s output, the first thing to check is whether a theme template is being rendered
+again.
 
 ## Two things that are not what they look like
 
