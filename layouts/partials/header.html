@@ -2,13 +2,17 @@
   header.html — the header: the masthead band, printed once, on every page.
 
   There is no running head any more. The row that used to sit *below* the
-  running head on the title page is now the header itself: the masthead, then
-  its imprint row carrying the profile glyphs and the reader's own two edition
-  controls — the language of this record and the day/night edition.
+  running head on the title page is now the header itself: the masthead voice at
+  Part Title scale, then its imprint row carrying the profile glyphs and the
+  reader's own two edition controls — the language of this record and the
+  day/night edition.
 
-  What the masthead says depends on the page kind, because the header is the
-  page's own title line:
-    * title page      → the site name (the edition's masthead)
+  One band on every page. The title page wears the same header a record wears:
+  the edition's name at the Part Title scale with the part of the edition named
+  beside it. What differs is only *which* part is named, because the header is
+  the page's own title line:
+    * title page      → the edition's name, with `Records` beside it
+                        (the plural resolves through i18n from the record count)
     * section / tag   → the index name, in the Part Title setting
     * a record        → the edition's name, so the record stays reachable from
                         anywhere; the record's own title is printed by
@@ -23,14 +27,19 @@
   The icons resolve at the site root: `printf "%s.svg" .id | absURL`, not the
   theme's relative `./linkedin.svg`, which 404s on /tags/…/ pages.
 */ -}}
-{{- $isRecord := eq .Kind "page" -}}
 {{- $isPart := or (eq .Kind "term") (eq .Kind "taxonomy") (and (eq .Kind "section") (not .IsHome)) -}}
 <header class="sheet masthead-band">
   <a class="visually-hidden-focusable" href="#contents">{{- i18n "chrome_skip" -}}</a>
-  <div class="frontmatter{{ if or $isPart $isRecord }} frontmatter--part{{ end }}">
+  <div class="frontmatter frontmatter--part">
     {{- if .IsHome -}}
-    <h1 class="masthead">
-      <a href="{{- "/" | absLangURL -}}">{{- site.Params.name | default site.Title -}}</a>
+    {{- /* The title page in the same voice as every other page's header: the
+      edition's name, then the part of the edition it is. The count is the
+      edition's own published record count from records.html, so the label can
+      only ever say `Record` when there is one record. The h1 stays here
+      because this band is the title page's heading. */ -}}
+    <h1 class="masthead masthead--part">
+      <a class="masthead__name" href="{{- "/" | absLangURL -}}">{{- site.Params.name | default site.Title -}}</a>
+      <span class="masthead__part">{{- i18n "chrome_record" (len (.Scratch.Get "records")) -}}</span>
     </h1>
     {{- else if $isPart -}}
     {{- /* Hugo's term title is the lowercased key, so the header names the
@@ -51,7 +60,7 @@
     {{- else -}}
     <a class="masthead masthead--part" href="{{- "/" | absLangURL -}}">
       <span class="masthead__name">{{- site.Params.name | default site.Title -}}</span>
-      <span class="masthead__part">{{- i18n "chrome_record" -}}</span>
+      <span class="masthead__part">{{- i18n "chrome_record" 1 -}}</span>
     </a>
     {{- end -}}
 
@@ -75,16 +84,10 @@
         </nav>
         {{- end -}}
 
-        {{- $edition := "" -}}
-        {{- if or $isPart $isRecord -}}
-        {{- /* Inner pages keep the row's shape — profile links, then the language
-          of this record, then the day/night dial — without the title page's labels:
-          the masthead at Part Title scale is already the row's left half. */ -}}
-        {{- $edition = partial "edition-controls.html" (dict "page" . "labelled" false) -}}
-        {{- else -}}
-        {{- $edition = partial "edition-controls.html" (dict "page" . "labelled" true) -}}
-        {{- end -}}
-        {{- $edition -}}
+        {{- /* Every page keeps the row's shape — profile links, then the language
+          of this record, then the day/night dial — without labels: the masthead at
+          Part Title scale is already the row's left half. */ -}}
+        {{- partial "edition-controls.html" (dict "page" .) -}}
       </nav>
     </div>
   </div>

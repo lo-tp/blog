@@ -15,10 +15,11 @@
 {{- $index := $techs | append $singles -}}
 
 {{- if .IsHome -}}
-{{- /* The header — the masthead and its imprint row with the profile links and
-  the reader's two edition controls — is printed by layouts/partials/header.html,
-  which the shell renders on every page. The title page is that band's home
-  ground; nothing here repeats it. */ -}}
+{{- /* The header — the masthead band: the edition's name at Part Title scale
+  with this part of the edition named beside it, then the profile links and the
+  reader's two edition controls — is printed by layouts/partials/header.html,
+  which the shell renders on every page. The title page wears that band exactly
+  as a record does; nothing here repeats or enlarges it. */ -}}
 
 <div class="spread">
   {{- partial "index-rail.html" (dict "page" .) -}}

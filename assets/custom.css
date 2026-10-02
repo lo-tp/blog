@@ -99,11 +99,11 @@
      body face is wider than an average character, so 57ch lands near 75
      characters per line at 17px — the end of the comfortable band, not past it. */
   --measure-read: 57ch;
-  /* --header-h is the FLOOR the header band must clear, not its height: a
-     masthead at clamp(2.4rem …) plus its imprint row is taller than 64px on
-     desktop. .masthead-band reports its measured height into --band-h and the
-     sticky index rail and the year anchors use that; --header-h only keeps a
-     minimum, so the band never collapses. */
+  /* --header-h is the FLOOR the header band must clear, not its height: the
+     masthead band — masthead voice at Part Title scale plus its control row —
+     is taller than 64px on desktop. .masthead-band reports its measured height
+     into --band-h and the sticky index rail and the year anchors use that;
+     --header-h only keeps a minimum, so the band never collapses. */
   --header-h: 64px;
   --band-h: 0px;
 
@@ -283,37 +283,15 @@ hr {
 }
 
 /* The header's control row: profile links → language switch → dark-mode dial.
-   On the title page each of the reader's own two controls is named in the
-   apparatus voice; on inner pages the row is unlabelled, because the masthead
-   at Part Title scale is already its left half. The Chinese edition sets the
-   labels in its own head face, as every other apparatus label does. */
+   Unlabelled on every page, the title page included: the masthead at Part Title
+   scale is already the row's left half, and each control names itself in its
+   accessible name. */
 .frontmatter-controls {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.95rem;
   flex-wrap: wrap;
-}
-
-.edition-control {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.edition-control__label {
-  font-family: var(--f-display);
-  font-weight: 500;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-
-:lang(zh) .edition-control__label {
-  font-family: var(--f-cjk-head);
-  letter-spacing: 0.06em;
 }
 
 /* Social: drawn glyphs from the icon set the theme ships, in one weight. */
@@ -421,10 +399,11 @@ html.dark .btn-dark .shade {
    5. The header — the masthead band, sticky on every page
    --------------------------------------------------------------------------- */
 
-/* The header IS the title page's masthead band: masthead, then its imprint row
-   carrying the profile links and the two edition controls, then the 2px rule.
-   It is sticky at the top of the sheet on every page and it is not sticky
-   inside: the band is one piece, so `--header-h` is a *minimum* — the band's
+/* The header IS the title page's masthead band: masthead voice at Part Title
+   scale, then its imprint row carrying the profile links and the two edition
+   controls, then the 2px rule. It is sticky at the top of the sheet on every
+   page and it is not sticky inside: the band is one piece, so `--header-h` is a
+   *minimum* — the band's
    own height comes from its padding and the masthead's scale, and
    .masthead-band measures it so the sticky index rail and the #y#### anchors
    sit below it rather than under it. */
@@ -458,12 +437,13 @@ html.dark .masthead-band {
 .masthead {
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: clamp(2.4rem, 4.4vw, 3.25rem);
-  line-height: 0.95;
-  letter-spacing: 0.1em;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  line-height: 1.05;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .masthead a {
@@ -471,8 +451,9 @@ html.dark .masthead-band {
   text-decoration: none;
 }
 
-/* A technique or section heading uses the same voice at a size that fits a
-   multi-word name instead of a four-letter one. */
+/* Part Title: the size the masthead voice is set at everywhere — on the title
+   page, on a technique or section heading, on a record. It fits a multi-word
+   name instead of a four-letter one. */
 .masthead--part {
   font-size: clamp(1.5rem, 3.2vw, 2.1rem);
   letter-spacing: 0.08em;
@@ -485,9 +466,11 @@ html.dark .masthead-band {
   padding-bottom: var(--g-2);
 }
 
-/* Inner pages: the edition's name in the header, with the part of the edition
-   you are in named beside it — the running head's job, done in the masthead's
-   voice. */
+/* Every page's header row: the edition's name (or the part title) with the part
+   of the edition you are in named beside it — the running head's job, done in
+   the masthead's voice. The name is a link on the title page and on a record;
+   a part title is the page's own heading, so it is not. */
+.masthead--part,
 a.masthead--part {
   display: inline-flex;
   align-items: baseline;

@@ -1,39 +1,20 @@
 {{- /*
   edition-controls.html — the reader's two edition controls, in one row.
 
-  Usage: partial "edition-controls.html" (dict "page" . "labelled" true)
+  Usage: partial "edition-controls.html" (dict "page" .)
 
   The language of this record, then the day/night edition. The language control
   renders only where a translation twin exists (see lang-switch.html), so the
   row is not always two controls long.
 
-  labelled=true names each control in the apparatus voice and is the title
-  page's setting; labelled=false is the inner-page header, where the masthead
-  already sets the row. The order this partial emits — language switch ->
-  dark-mode dial — is what header.html's script then wires, so it must stay in
-  that order and stay before that script.
-*/ -}}
-{{- if .labelled -}}
-<span class="edition-control">
-  <span class="edition-control__label">{{- i18n "chrome_edition" -}}</span>
-  {{- partial "lang-switch.html" (dict "page" .page "navClass" "lang-switch" "linkClass" "") -}}
-</span>
+  The row is unlabelled on every page, the title page included: the masthead at
+  Part Title scale is already the header row's left half. Each control still
+  names itself in its accessible name.
 
-<span class="edition-control">
-  <span class="edition-control__label">{{- i18n "chrome_edition_night" -}}</span>
-  <span
-    class="btn-dark"
-    role="button"
-    tabindex="0"
-    aria-label="{{- i18n "chrome_theme_toggle" -}}"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle class="dial" cx="12" cy="12" r="8.5" />
-      <path class="shade" d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
-    </svg>
-  </span>
-</span>
-{{- else -}}
+  The order this partial emits — language switch -> dark-mode dial — is what
+  header.html's script then wires, so it must stay in that order and stay
+  before that script.
+*/ -}}
 {{- partial "lang-switch.html" (dict "page" .page "navClass" "lang-switch" "linkClass" "") -}}
 <span
   class="btn-dark"
@@ -46,4 +27,4 @@
     <path class="shade" d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
   </svg>
 </span>
-{{- end -}}
+

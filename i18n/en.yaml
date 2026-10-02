@@ -9,8 +9,13 @@
 - id: chrome_contents
   translation: 'Contents'
 
+# The header band's part label. Given a count it resolves the way
+# chrome_records_unit does: `Record` for one record, `Records` for any other
+# number — which is only ever asked on the title page.
 - id: chrome_record
-  translation: 'Record'
+  translation:
+    one: 'Record'
+    other: 'Records'
 
 - id: chrome_index
   translation: 'Index'

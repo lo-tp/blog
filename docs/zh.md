@@ -44,8 +44,8 @@ installed), `/zh/index.xml`, a sitemap listing both languages, `hreflang` altern
 pages, and a language switch in the header — `中文` on English
 pages, `English` on Chinese ones. The header's control row therefore reads: profile links →
 language switch → dark-mode dial, at every width including a phone. There is no menu to open,
-so the dark-mode dial is one tap on a phone. On an inner page the row is unlabelled and the
-language control appears only where a twin exists; the night dial is always there.
+so the dark-mode dial is one tap on a phone. The row is unlabelled on every page, the title page
+included, and the language control appears only where a twin exists; the night dial is always there.
 
 The switch renders **only where a counterpart exists**: an untranslated post shows no `中文`
 link at all. Reach the Chinese edition from such a post through `/zh/`.
@@ -104,8 +104,8 @@ site's own:
 | --- | --- |
 | `layouts/_default/baseof.html` | the shell: pre-paint edition script, header, `<main class="sheet page">`, colophon |
 | `layouts/partials/head.html` | requests **one** stylesheet, `assets/custom.css`, concatenated to `main.css` and fingerprinted |
-| `layouts/partials/header.html` | the header: the masthead band — masthead or part title, then the profile links → language switch → dark-mode dial — sticky on every page, then the script that publishes its height and wires the dial. **It prints the page's only `<h1>`, including on a record** (the edition's name plus a `Record` part label); `single.html` prints the record's title as a `<h1 class="record__title">`, so a record page carries two level-1 headings — deliberate under the one-heading-per-page rule, and worth knowing before adding a third |
-| `layouts/partials/edition-controls.html` | the reader's two edition controls, labelled on the title page and plain on inner pages |
+| `layouts/partials/header.html` | the header: the masthead band — the edition's name or the part title at Part Title scale, then the profile links → language switch → dark-mode dial — sticky on every page, then the script that publishes its height and wires the dial. **On the title page and on a term page it prints the page's only `<h1>`** (name plus a `Records` part label, or the part title); on a record the band prints no `<h1>` at all — its masthead is a link (name plus a `Record` part label) and `single.html`'s `<h1 class="record__title">` is the page's single level-1 heading. The band never changes shape between page kinds |
+| `layouts/partials/edition-controls.html` | the reader's two edition controls, unlabelled on every page |
 | `layouts/_default/list.html`, `layouts/partials/{records,ledger,record-row,index-rail}.html` | the title page, the contents ledger, the technique index, pagination |
 | `layouts/_default/single.html` | a record: meta rule, body, edition switch, earlier/later |
 | `layouts/partials/record-row.html` | one ledger row: date, title, tags. Nothing about the other language |

@@ -26,10 +26,10 @@ colors:
 typography:
   masthead:
     fontFamily: "'Archivo Narrow', 'Arial Narrow', sans-serif"
-    fontSize: "clamp(2.4rem, 4.4vw, 3.25rem)"
+    fontSize: "clamp(1.5rem, 3.2vw, 2.1rem)"
     fontWeight: 700
-    lineHeight: 0.95
-    letterSpacing: "0.1em"
+    lineHeight: 1.05
+    letterSpacing: "0.08em"
   part-title:
     fontFamily: "'Archivo Narrow', 'Arial Narrow', sans-serif"
     fontSize: "clamp(1.5rem, 3.2vw, 2.1rem)"
@@ -191,8 +191,9 @@ long titles and long paragraphs must stay readable. Chinese is set the way Chine
 for prose, the sans for headings.
 
 ### Hierarchy
-- **Masthead** (700, clamp(2.4rem, 4.4vw, 3.25rem), lh 0.95, tracked 0.1em, capitals): the title
-  page only. Section and technique pages use **Part Title** (clamp(1.5rem, 3.2vw, 2.1rem)).
+- **Masthead / Part Title** (700, clamp(1.5rem, 3.2vw, 2.1rem), lh 1.05, tracked 0.08em, capitals):
+  the header band on **every** page — the title page, a section or technique page, a record. One
+  scale for one component; the title page is not set larger than the page it heads.
 - **Record Title** (700, clamp(1.7rem, 3.6vw, 2.3rem), lh 1.16): the h1 of one record.
 - **Ledger Title** (700, 1.3rem, lh 1.4): a row's title in the contents ledger.
 - **Body** (400, 17px, lh 1.7): article prose, 57ch measure (≈75 characters per line).
@@ -211,9 +212,10 @@ Anything that reads as a sentence is set in text, sentence case.
 
 A single **sheet**: `max-width: 1220px`, centred, with `clamp(1rem, 3vw, 2rem)` side padding.
 On the sheet: a **header** — the masthead band itself, sticky at the top of the sheet on every
-page (masthead or part title at the near edge, controls right-aligned in the fixed order profile
-links → language switch → dark-mode dial, 2px rule below) — then the page content, then the
-**colophon**. There is no separate running head: the title page's masthead row *is* the header.
+page (the edition's name or the part title, masthead voice at Part Title scale, at the near edge;
+controls right-aligned in the fixed order profile links → language switch → dark-mode dial, 2px
+rule below) — then the page content, then the **colophon**. There is no separate running head and
+no second masthead: the header row *is* the masthead, on the title page as on every other page.
 `--header-h: 64px` is the floor the band must clear, never its height; the band publishes its
 measured height as `--band-h` and everything that sticks below it offsets from that. No template
 from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
@@ -254,8 +256,14 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
 ## Components
 
 ### Header (the masthead band)
-- **Style:** full sheet width, 2px ink rule below, sticky at top 0 on every page. Its height is its own content: masthead scale on the title page, Part Title scale on a section or technique page, Part Title scale with a `Record` part label on a record page. Below 1000px it stacks into one column, control order preserved.
-- **Content:** the masthead or part title at the near edge; profile links → language switch → dark-mode dial at the far edge, labelled on the title page and plain on inner pages.
+- **Style:** full sheet width, 2px ink rule below, sticky at top 0 on every page, one band on every
+  page: masthead voice at Part Title scale everywhere — the title page's name plus its part label,
+  the part title on a section or technique page, the edition's name plus a `Record` part label on a
+  record page. Its height is its own content. Below 1000px it stacks into one column, control order
+  preserved.
+- **Content:** the edition's name or the part title at the near edge; profile links → language
+  switch → dark-mode dial at the far edge, unlabelled on every page — each control names itself in
+  its accessible name instead.
 
 ### Language switch
 - **Style:** outlined rectangle, no radius, `0.25rem 0.4rem` padding, 1px `--rule-2` border, Technical Blue text, `hreflang` and the destination language named in the accessible name.
