@@ -153,8 +153,8 @@ the night edition dims its accents with its paper so the contrast relationship i
 
 ### Secondary
 - **Brick** (#b03f26): the reserved ink. Only the record or technique you are currently on — the
-  date in a record's meta rule, the current entry in the technique index, a paired row's language
-  mark, a named state such as `Untranslated post`. Never used for decoration,
+  date in a record's meta rule, the current entry in the technique index, a record's edition
+  switch on hover, a named state such as `Untranslated post`. Never used for decoration,
   never two things on one screen. Night: **Night Brick** (#e08166).
 
 ### Neutral
@@ -221,7 +221,8 @@ from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
 - **Title page and technique pages** use a two-column **spread**: a 264px **index rail** on the
   left (techniques counted, then the year spine, then the author plate), sticky from 1000px up;
   the **contents ledger** on the right, grouped by a **year spine** (`6.2rem` folio column +
-  titles). A paired row keeps one title and a narrow tail column for its language mark.
+  titles). Every row is the same: date column plus one title, whether or not the record is
+  paired.
 - **Record pages** set one text block, `max-width: 57ch`, centred between the sheet margins.
   The edition switch and the earlier/later pair print inside the same measure.
 - **Rhythm is one scale.** `--g-1 … --g-5` (0.5 / 1 / 1.5 / 2.5 / 4rem), plus `--head-room:
@@ -229,9 +230,8 @@ from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
   ledger rows, `--block-gap: 2.25rem` between article blocks. More space above a heading than
   below it, everywhere, always.
 - **Responsive:** at 1000px the index plan stops being a column and travels with the ledger as a
-  sticky bar above it; at 720px rows collapse to one column with the language mark falling under
-  its own title, and the header band stacks into one column without losing the control order. No
-  control is ever hidden behind a menu.
+  sticky bar above it; at 720px rows collapse to one column, and the header band stacks into one
+  column without losing the control order. No control is ever hidden behind a menu.
 
 ## Elevation & Depth
 
@@ -269,12 +269,12 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
 ### Ledger row (contents)
 - **Style:** folio date in the 6.2rem column (tabular figures), title at 1.3rem, tag list beneath in Muted Ink at 0.76rem in the tags' own spelling. 1px bottom rule; `:last-child` has none.
 - **State:** hovering a row turns its title blue; the tag list stays quiet.
-- **Paired row:** `6.2rem 1fr auto`, one title only, plus a small outlined language mark (`ALSO IN` / `另有`) at the row's far edge that links straight to the twin. The twin's title is never printed here; reaching it means switching. An Untranslated row prints no mark.
+- **One title per row:** `6.2rem 1fr`, identical whether or not the record is a Translation pair. Nothing in a row names, marks or links the other language; the twin is reached from the record itself.
 
 ### Edition switch (signature component)
-- **Where:** the end of a record that exists in both languages, and the language mark on its ledger row.
+- **Where:** the end of a record that exists in both languages — and nowhere else on the site, not even the ledger.
 - **Style:** a 2px rule, then one right-aligned control — an apparatus label naming the act (`Read this record in` / `以该语言阅读这条记录`) beside the destination language in an outlined box. Never two columns holding the same record twice.
-- **The authored interaction:** on hover or keyboard focus, a paired row's language mark steps from Muted Ink to the reserved ink and takes its underline (120ms, `cubic-bezier(0.2, 0, 0.2, 1)`); the record's switch box takes the blue border and `--paper-pressed` fill. Reduced-motion gets the same end states with no movement. This is the only interaction on the ledger.
+- **The authored interaction:** on hover or keyboard focus the switch box takes the blue border and `--paper-pressed` fill and its label takes the reserved ink (120ms, `cubic-bezier(0.2, 0, 0.2, 1)`). Reduced-motion gets the same end states with no movement. This is the only authored interaction on a record page; the ledger has none.
 
 ### Index rail
 - **Style:** sticky 264px column: techniques (counted entries; a technique with one record is set as a plain name in the tail line), the year spine, the author plate (64px portrait, name, bio, profile links).
@@ -297,7 +297,7 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
 ### Do:
 - **Do** change a token in `assets/custom.css` rather than a selector in a template. Every
   measure, colour, rule and motion in the site comes from that one file.
-- **Do** name every state in words: `Untranslated post`, `另有`, `Page 2 / 5`,
+- **Do** name every state in words: `Untranslated post`, `Page 2 / 5`,
   `← 上一页`. Colour is never the only signal.
 - **Do** keep the header contract: profile links → language switch → dark-mode dial in the header
   band, with the script that wires the dial after them, at every width, and the band's measured

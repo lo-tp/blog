@@ -51,12 +51,6 @@
 - id: chrome_date_format
   translation: '2006-01-02'
 
-- id: chrome_pair
-  translation: 'In its other language'
-
-- id: chrome_pair_mark
-  translation: 'Also in'
-
 - id: chrome_record_switch
   translation: 'Read this record in'
 

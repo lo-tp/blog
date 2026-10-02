@@ -902,32 +902,7 @@ a.masthead--part {
   border-color: var(--nav);
 }
 
-/* One title per row. A paired record is marked, not doubled: a short language
-   mark names that a twin exists and links straight to it, so the pairing stays
-   visible in the index without printing the other edition's title. An
-   Untranslated post prints no mark at all — a legal state, not a debt. */
-.rec[data-paired] {
-  grid-template-columns: 6.2rem 1fr auto;
-}
 
-.rec__pair-mark {
-  align-self: start;
-  font-family: var(--f-display);
-  font-weight: 600;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  text-decoration: none;
-  border: 1px solid var(--rule-2);
-  padding: 0.25rem 0.4rem;
-  white-space: nowrap;
-}
-
-:lang(zh) .rec__pair-mark {
-  font-family: var(--f-cjk-head);
-  letter-spacing: 0.06em;
-}
 
 /* Named states, never colour alone. */
 .state {
@@ -1527,8 +1502,7 @@ a.masthead--part {
     font-size: 16px;
   }
 
-  .rec,
-  .rec[data-paired] {
+  .rec {
     grid-template-columns: 1fr;
     gap: 0.35rem;
   }
@@ -1579,21 +1553,5 @@ a.masthead--part {
 
 /* The ledger does not animate itself in: a row's date and title hold their full
    contrast at every scroll position, and a printed page does not fade itself into
-   view. The one authored interaction belongs to the subject instead — a paired
-   record's language mark steps from Muted Ink to the reserved ink and takes its
-   underline when the reader reaches for it. Whole steps, 120ms, only on a row
-   that really has a twin. */
-.rec__pair-mark {
-  transition: color var(--step) var(--ease), border-color var(--step) var(--ease);
-}
-
-.rec[data-paired]:hover .rec__pair-mark,
-.rec[data-paired]:focus-within .rec__pair-mark,
-.rec__pair-mark:hover,
-.rec__pair-mark:focus-visible {
-  color: var(--mark);
-  border-color: var(--mark);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
+   view. The one authored interaction on the page belongs to the edition switch at
+   the end of a record, not to a row. */

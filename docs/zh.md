@@ -90,8 +90,8 @@ list of things that break **without a build error or a failing check** — the p
 checks is that reading the pages is what catches them.
 
 - a `translationKey` on one side only (see above): the switch works in one direction.
-- a paired record whose row prints two titles, or a record that prints its twin's body beside
-  its own: the one-title-per-row rule broken.
+- a ledger row that prints two titles, or a record page that prints its twin beside its own: the
+  one-title-per-row and one-edition-at-a-time rules broken.
 - a header whose controls overlap, wrap out of order, or a dial that does nothing when clicked.
 - Chinese pages that lost `lang="zh"`, Chinese dates, or `/zh/` tag links.
 
@@ -108,7 +108,7 @@ site's own:
 | `layouts/partials/edition-controls.html` | the reader's two edition controls, labelled on the title page and plain on inner pages |
 | `layouts/_default/list.html`, `layouts/partials/{records,ledger,record-row,index-rail}.html` | the title page, the contents ledger, the technique index, pagination |
 | `layouts/_default/single.html` | a record: meta rule, body, edition switch, earlier/later |
-| `layouts/partials/record-row.html` | one ledger row: one title, plus the language mark where a twin exists |
+| `layouts/partials/record-row.html` | one ledger row: date, title, tags. Nothing about the other language |
 | `layouts/404.html` | the page printed when a record is not there |
 | `assets/custom.css` | every colour, rule, measure, spacing rhythm, state and movement. Nothing else styles this site |
 
