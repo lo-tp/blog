@@ -729,8 +729,19 @@ a.masthead--part {
   margin: 0;
   padding: 0;
   list-style: none;
+  /* One shared table for the three rows: the name column is only as wide as
+     the widest service name, the handles line up one gap behind it. A fixed
+     5.2rem column made the horizontal gap to a reader's own handle bigger
+     than the distance to the next row — every pair read as misaligned. */
   display: grid;
-  gap: 0.2rem;
+  grid-template-columns: max-content 1fr;
+  gap: 0.2rem 0.5rem;
+}
+
+.author__links li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
 }
 
 .author__links a {
@@ -741,8 +752,8 @@ a.masthead--part {
   color: var(--ink);
   text-decoration: none;
   display: grid;
-  grid-template-columns: 5.2rem 1fr;
-  gap: 0.5rem;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
 }
 
 .author__links a:hover {
