@@ -56,6 +56,8 @@ you finish, say which failure modes you checked by reading the output, and which
   `{{- /* … */ -}}`.
 - **Article text is never generated.** Tooling scaffolds files; the author writes and translates.
 - **No commit, no deploy, no `git` history rewriting unless asked.** `deploy.sh` is the author's.
+- **Never load the `impeccable` skill unless `/skill:impeccable` is invoked explicitly.** Design
+  work here goes through `DESIGN.md`.
 
 ## The preview trap (it has burned measurements before)
 
