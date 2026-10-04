@@ -233,8 +233,12 @@ from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
   The edition switch and the earlier/later pair print inside the same measure.
 - **Rhythm is one scale.** `--g-1 … --g-5` (0.5 / 1 / 1.5 / 2.5 / 4rem), plus `--head-room:
   2.75rem` above a heading, `--head-room-after: 0.85rem` below it, `--row-gap: 1.9rem` between
-  ledger rows, `--block-gap: 2.25rem` between article blocks. More space above a heading than
-  below it, everywhere, always.
+  ledger rows, `--block-gap: 2.25rem` between article blocks, and `--band-clear: 1rem` — the one
+  clearance under the header band. It is written on a surface's own wrapper (`padding-top` on
+  `.spread`; the same clear as `margin-top` where a surface has no spread) and read by the sticky
+  index rail, the record TOC and the year/heading anchors, so nothing shifts when a sticky element
+  starts pinning. `main`, `nav` and `section` carry no top padding.
+  More space above a heading than below it, everywhere, always.
 - **Responsive:** at 1000px the index plan stops being a column and travels with the ledger as a
   sticky bar above it; at 720px rows collapse to one column, and the header band stacks into one
   column without losing the control order. No control is ever hidden behind a menu.
@@ -312,7 +316,8 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
   `← 上一页`. Colour is never the only signal.
 - **Do** keep the header contract: profile links → language switch → dark-mode dial in the header
   band, with the script that wires the dial after them, at every width, and the band's measured
-  height published as `--band-h` so the sticky index rail and the year anchors sit below it.
+  height published as `--band-h` so the sticky index rail and the year anchors sit below it, at the
+  same `--band-clear` the surface opens with.
 - **Do** resolve tag and feed links with `absLangURL`, so a Chinese reader stays under `/zh/`.
 - **Do** put more space above a heading (`--head-room`) than below it (`--head-room-after`).
 - **Do** keep secondary chrome text above 4.5:1 — `--ink-3` is #5f666c (5.25:1 on paper) for a

@@ -126,6 +126,13 @@
      --header-h only keeps a minimum, so the band never collapses. */
   --header-h: 64px;
   --band-h: 0px;
+  /* The ONE clearance under the band. It is written once, on --band-clear, and
+     every measurement derived from the band reads it: the top of a surface, the
+     sticky index rail and record TOC, the year and heading anchors. One value
+     means the content never shifts when a sticky element starts pinning, and an
+     anchor jump lands where the page already begins. The landmarks — main, nav,
+     section — carry none of it: a surface's own wrapper carries it. */
+  --band-clear: 1rem; /* 16px: --g-2, the offset the sticky pins already assumed */
 
   /* The only spacing rhythm on the page. More above a heading than below it. */
   --head-room: 2.75rem;
@@ -412,10 +419,21 @@ html.dark .btn-dark .shade {
   color: var(--mark);
 }
 
+/* The page box carries no top padding: the band's 2px rule is followed by the
+   surface's own wrapper, and that wrapper is what opens the clear. */
 .page {
   position: relative;
-  padding-top: clamp(1.5rem, 3vw, 2.5rem);
   padding-bottom: var(--g-5);
+}
+
+/* A surface with no .spread of its own — a record (article), the /tags/ index
+   and the 404 card (both a bare section under main) — takes the same clear as a
+   margin, so no landmark ends up with padding. Scoping to .page's own children
+   leaves the ledger inside a spread untouched. */
+.page > .record,
+.page > .contents,
+.page > .notfound {
+  margin-top: var(--band-clear);
 }
 
 /* ----------------------------------------------------------------------------
@@ -540,17 +558,28 @@ a.masthead--part {
    6. The spread: index (left) and contents ledger (right)
    --------------------------------------------------------------------------- */
 
+/* The spread is where the clear lives: its padding-top is the only top padding
+   on this surface, and the rail and the ledger open level with each other below
+   it. */
 .spread {
   display: grid;
   grid-template-columns: var(--measure-index) 1fr;
   gap: clamp(2rem, 4vw, 3.5rem);
-  padding-top: var(--g-3);
+  padding-top: var(--band-clear);
   align-items: start;
 }
 
+/* Neither landmark inside the spread pads itself. */
+.index,
+.contents {
+  padding: 0;
+}
+
+/* Pinned at the same clear the spread already opens with, so the rail does not
+   shift down when scrolling begins. */
 .index {
   position: sticky;
-  top: calc(var(--band-h) + 1rem);
+  top: calc(var(--band-h) + var(--band-clear));
   display: grid;
   gap: var(--g-3);
 }
@@ -773,7 +802,7 @@ a.masthead--part {
    the /tags/ index. The year markers inside it are the chronology, not a head. */
 .year {
   margin-top: var(--head-room);
-  scroll-margin-top: calc(var(--band-h) + 1rem);
+  scroll-margin-top: calc(var(--band-h) + var(--band-clear));
 }
 
 /* The ledger prints flush at the top of the spread: the first year group
@@ -1099,7 +1128,7 @@ a.masthead--part {
   line-height: 1.25;
   /* A jumped-to heading lands below the sticky band, not under it: the same
      offset the year anchors keep. */
-  scroll-margin-top: calc(var(--band-h) + 1rem);
+  scroll-margin-top: calc(var(--band-h) + var(--band-clear));
 }
 
 .record__body h2 {
@@ -1417,7 +1446,7 @@ a.masthead--part {
   grid-column: 2;
   grid-row: 1 / span 4;
   position: sticky;
-  top: calc(var(--band-h) + 1rem);
+  top: calc(var(--band-h) + var(--band-clear));
 }
 
 .record__toc__title {
@@ -1544,7 +1573,7 @@ a.masthead--part {
 
   .index {
     position: sticky;
-    top: var(--band-h);
+    top: calc(var(--band-h) + var(--band-clear));
     z-index: 20;
     background: var(--paper);
     padding: 0.7rem 0;
