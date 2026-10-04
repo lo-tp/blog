@@ -48,9 +48,11 @@ _Avoid_: auto-translation, MT
 Canonical Chinese renderings to use consistently across the Chinese edition. The author
 owns these calls; anything marked _(proposed)_ is a draft awaiting the author's decision.
 
-**编程代理** _(proposed)_:
-A coding agent — an AI tool that writes and edits code on the author's behalf.
-_Avoid_: 代码代理, AI 助手 (when specifically meaning a coding agent)
+**Coding Agent**:
+A coding agent — an AI tool that writes and edits code on the author's behalf. Kept in
+English inside Chinese prose, like any other tool name; in running Chinese text a bare
+「代理」 reads fine once it is established.
+_Avoid_: 编程代理, 代码代理, AI 助手 (when specifically meaning a coding agent)
 
 **测试驱动开发（TDD）**:
 Test-driven development: writing the test before the code.

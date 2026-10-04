@@ -68,14 +68,13 @@ spelling of a tag creates a second tag page):
 
 | English tag | Chinese tag |
 | --- | --- |
-| LeetCode, DP, DFS, BFS, TDD, LLM, ES7, UX, React, Redux, Notion, Mocha, Meteor, Linux, iframe, postmessage | keep as-is |
+| LeetCode, DP, DFS, BFS, TDD, LLM, ES7, UX, React, Redux, Notion, Mocha, Meteor, Linux, iframe, postmessage, Coding Agent | keep as-is |
 | Algorithm | 算法 |
 | Bit Operation | 位运算 |
 | Functional Programming | 函数式编程 |
 | Greedy | 贪心 |
 | Test | 测试 |
 | Reading Notes | 读书笔记 |
-| Coding Agent | 编程代理 |
 | Skill | your call — 技能 reads oddly; keeping `Skill` is defensible |
 | Learn | drop it; it carries no meaning as a tag |
 
@@ -94,6 +93,11 @@ checks is that reading the pages is what catches them.
   one-title-per-row and one-edition-at-a-time rules broken.
 - a header whose controls overlap, wrap out of order, or a dial that does nothing when clicked.
 - Chinese pages that lost `lang="zh"`, Chinese dates, or `/zh/` tag links.
+- a `。**` followed straight by Chinese text: CommonMark will not close the emphasis there (a
+  closing `**` after full-width punctuation is only valid when what follows is whitespace or
+  punctuation), and the page prints the asterisks. Put the `。` after the closing `**` — or end
+  the bold at a line end, or follow it with `「`. It builds clean and the English original looks
+  fine.
 
 ## The templates and the stylesheet (what the design is made of)
 
