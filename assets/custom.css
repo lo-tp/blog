@@ -134,6 +134,10 @@
      section — carry none of it: a surface's own wrapper carries it. */
   --band-clear: 1rem; /* 16px: --g-2, the offset the sticky pins already assumed */
 
+  /* The sheet's side padding, named once: the header band's rule runs to the
+     sheet's edge, past it, and the page turns' foot does the same. */
+  --pad-sheet: clamp(1rem, 3vw, 2rem);
+
   /* The only spacing rhythm on the page. More above a heading than below it. */
   --head-room: 2.75rem;
   --head-room-after: 0.85rem;
@@ -324,7 +328,7 @@ hr {
 .sheet {
   max-width: var(--measure-sheet);
   margin: 0 auto;
-  padding: 0 clamp(1rem, 3vw, 2rem);
+  padding: 0 var(--pad-sheet);
 }
 
 /* The header's control row: profile links → language switch → dark-mode dial.
@@ -1015,14 +1019,20 @@ a.masthead--part {
    8. Pagination — page turns, not pills
    --------------------------------------------------------------------------- */
 
+/* The foot of the page mirrors its head: the same 2px ink rule the band closes
+   with, the same width — out past the sheet's own padding to its edge, with the
+   words brought back to the content edge — and the same ink, blue only where the
+   jump is being taken, as on the masthead, a ledger title or an index entry. */
 .turn {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+  margin-inline: calc(-1 * var(--pad-sheet));
+  padding-inline: var(--pad-sheet);
   margin-top: var(--head-room);
   padding-top: var(--g-2);
-  border-top: 1px solid var(--ink);
+  border-top: 2px solid var(--ink);
 }
 
 .turn__where {
@@ -1030,7 +1040,7 @@ a.masthead--part {
   font-size: 0.76rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1041,11 +1051,12 @@ a.masthead--part {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--nav);
+  color: var(--ink);
 }
 
-.turn a:hover {
-  color: var(--nav-hover);
+.turn a:hover,
+.turn a:focus-visible {
+  color: var(--nav);
   text-decoration: underline;
 }
 

@@ -149,7 +149,9 @@ the night edition dims its accents with its paper so the contrast relationship i
 
 ### Primary
 - **Technical Blue** (#2f5d8a): navigation only — every link that moves you somewhere in the
-  site, the language switch, index entries, page turns. Night: **Night Technical Blue** (#8fbce6).
+  site when the jump is being taken: the language switch, index entries, and a ledger title or a
+  page turn on hover and focus (both print in Graphite Ink at rest). Night: **Night Technical
+  Blue** (#8fbce6).
 
 ### Secondary
 - **Brick** (#b03f26): the reserved ink. Only the record or technique you are currently on — the
@@ -299,7 +301,7 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
 - **Isolate-and-dim:** on a technique page the current entry is solid and marked in the reserved ink; every other entry stays present and legible, dimmed to Muted Ink. Nothing is removed.
 
 ### Page turns
-- **Style:** a 1px top rule across the sheet, position (`Page 2 / 5`) in tabular figures at one end, named turns (`← 上一页`, `下一页 →`) at the other. No arrows without names, no pills.
+- **Style:** the foot of the page, mirroring its head: a 2px ink rule the **same width as the header band's** (to the sheet's edge, with the words at the content edge), the position (`Page 2 / 5`) in tabular figures in Graphite Ink at one end, the named turns (`← 上一页`, `下一页 →`) in the same ink at the other, blue only on hover and focus. It prints after the spread, never as a row of it: the sticky index rail would be crossed by a bar placed inside the grid. The year counts name the blog (`4 BLOGS`), the same word the header band wears; the chrome never calls a post a record. No arrows without names, no pills.
 
 ### Record neighbours
 - **Style:** two labelled halves, "Earlier record" and "Later record", each naming the title it leads to. Never an anonymous back-to-list arrow.

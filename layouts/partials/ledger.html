@@ -1,17 +1,24 @@
 {{- /*
   ledger.html — the contents, grouped under year markers.
 
-  Usage: partial "ledger.html" (dict "pages" $pages "paginate" true)
+  Usage: partial "ledger.html" (dict "page" . "pages" $pages "paginate" true)
 
   The grouping is derived from the records themselves, so a year marker never
   claims a number that is not on the page. Each year is an anchor target for
-  the year spine in the index rail.
+  the year spine in the index rail. The page turns this pagination produces are
+  printed by page-turns.html, after the spread.
 */ -}}
 {{- $pages := .pages -}}
 {{- $paginator := "" -}}
 {{- if .paginate -}}
 {{- $paginator = .page.Paginate $pages -}}
 {{- $pages = $paginator.Pages -}}
+{{- /* Paginate is called once per page, here. The page turns themselves print
+  at the foot of the page — see layouts/partials/page-turns.html — so hand the
+  paginator on rather than rendering the bar inside the ledger. */ -}}
+{{- with $paginator -}}
+{{- $.page.Scratch.Set "paginator" . -}}
+{{- end -}}
 {{- end -}}
 
 {{- $years := slice -}}
@@ -46,19 +53,3 @@
   </div>
   {{- end -}}
 </section>
-
-{{- if and .paginate $paginator -}}
-{{- if gt $paginator.TotalPages 1 -}}
-<nav class="turn" aria-label="{{ i18n "chrome_contents" }}">
-  <span class="turn__where">{{ i18n "chrome_page_of" }} {{ $paginator.PageNumber }} / {{ $paginator.TotalPages }}</span>
-  <div class="turn__nav">
-    {{- if $paginator.HasPrev }}
-    <a href="{{ $paginator.Prev.URL }}">← {{ i18n "prev_page" }}</a>
-    {{- end }}
-    {{- if $paginator.HasNext }}
-    <a href="{{ $paginator.Next.URL }}">{{ i18n "next_page" }} →</a>
-    {{- end }}
-  </div>
-</nav>
-{{- end -}}
-{{- end -}}

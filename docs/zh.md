@@ -106,7 +106,7 @@ site's own:
 | `layouts/partials/head.html` | requests **one** stylesheet, `assets/custom.css`, concatenated to `main.css` and fingerprinted |
 | `layouts/partials/header.html` | the header: the masthead band — the edition's name (with a `Blog` part label) or the part title at Part Title scale, then the profile links → language switch → dark-mode dial — sticky on every page, then the script that publishes its height and wires the dial. **On the title page and on a term page it prints the page's only `<h1>`** (name plus `Blog`, or the part title); on a record the band prints no `<h1>` at all — its masthead is a link back to the title page and `single.html`'s `<h1 class="record__title">` is the page's single level-1 heading. The band never changes shape, scale or wording between page kinds |
 | `layouts/partials/edition-controls.html` | the reader's two edition controls, unlabelled on every page |
-| `layouts/_default/list.html`, `layouts/partials/{records,ledger,record-row,index-rail}.html` | the title page, the contents ledger, the technique index, pagination |
+| `layouts/_default/list.html`, `layouts/partials/{records,ledger,record-row,index-rail,page-turns}.html` | the title page, the contents ledger, the technique index, pagination. `ledger.html` calls `Paginate` once and leaves the paginator in the page's Scratch; `page-turns.html` reads it and prints the bar **after** the spread, as the foot of the page — a row of the spread would be crossed by the sticky index rail |
 | `layouts/_default/single.html` | a record: meta rule, body, edition switch, earlier/later |
 | `layouts/partials/record-row.html` | one ledger row: date, title, tags. Nothing about the other language |
 | `layouts/404.html` | the page printed when a record is not there |

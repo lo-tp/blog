@@ -1,0 +1,30 @@
+{{- /*
+  page-turns.html — the foot of a paginated ledger.
+
+  Called from list.html *after* the spread, never from inside it. The index rail
+  is sticky, and a sticky box taller than the room left to it overflows the grid
+  area it is confined to: as a row of the spread the bar was measured to be
+  crossed by the rail's own tail — 41px of overlap at 1490×900, the rule running
+  through the author plate. As a foot of the page the rail stops above it, and the
+  bar takes the width the header band has instead of the ledger column's.
+
+  It reads the paginator ledger.html created — `Paginate` is called once per page,
+  so this partial must not call it. The prev/next words come from hugo-paper's
+  i18n, which is why the theme is still installed.
+*/ -}}
+{{- $paginator := .Scratch.Get "paginator" -}}
+{{- with $paginator -}}
+{{- if gt .TotalPages 1 -}}
+<nav class="turn" aria-label="{{ i18n "chrome_contents" }}">
+  <span class="turn__where">{{ i18n "chrome_page_of" }} {{ .PageNumber }} / {{ .TotalPages }}</span>
+  <div class="turn__nav">
+    {{- if .HasPrev }}
+    <a href="{{ .Prev.URL }}">← {{ i18n "prev_page" }}</a>
+    {{- end }}
+    {{- if .HasNext }}
+    <a href="{{ .Next.URL }}">{{ i18n "next_page" }} →</a>
+    {{- end }}
+  </div>
+</nav>
+{{- end -}}
+{{- end -}}

@@ -26,6 +26,11 @@
   {{- partial "ledger.html" (dict "page" . "pages" $records "paginate" true) -}}
 </div>
 
+{{- /* The page turns belong to the foot of the page, not to a row of the spread:
+  they take the width the header band has, and the sticky index rail stops above
+  them. */ -}}
+{{- partial "page-turns.html" . -}}
+
 {{- else if eq .Kind "taxonomy" -}}
 {{- /* The index on its own. The header band above already names it: this block
   prints no heading and opens no rule, because a page is headed once. */ -}}
