@@ -139,6 +139,24 @@
   --head-room-after: 0.85rem;
   --row-gap: 1.9rem;
   --block-gap: 2.25rem;
+
+  /* Optical alignment, not arithmetic. The index rail's first line and the first
+     year mark already start level as BOXES — both at --band-clear — but not as
+     ink: a 1.35rem setting carries more half-leading above a taller cap than the
+     0.9rem entries beside it, so "2026" reads a few pixels below "LeetCode".
+     This nudges the first year group only; every later group keeps the
+     --head-room rhythm. The Chinese index names are set in the CJK head, which
+     hangs the other way against the same year mark, so the edition carries its
+     own measured number. Both belong to the two-column spread and are switched
+     off below 1000px, where there is no second column to align against. */
+  --year-align: -4.5px; /* measured at 1490px: 2026 ink sat 4.46px below LeetCode ink */
+}
+
+:lang(zh) {
+  /* The same optical correction, measured against this edition's index names:
+     they are set 0.85rem in the CJK head, whose ink hangs BELOW the year mark
+     it is level with as a box. */
+  --year-align: 6.9px; /* measured at 1490px: the year mark sat 6.87px above the index name */
 }
 
 html.dark {
@@ -806,10 +824,11 @@ a.masthead--part {
 }
 
 /* The ledger prints flush at the top of the spread: the first year group
-   takes no reserved head-room, so it starts level with the index rail.
-   Later groups keep the --head-room rhythm. */
+   takes no reserved head-room, so it starts level with the index rail — and
+   --year-align corrects the ink, so the two columns' first lines read level at
+   their different scales. Later groups keep the --head-room rhythm. */
 .contents > .year:first-of-type {
-  margin-top: 0;
+  margin-top: var(--year-align);
 }
 
 .year__rows {
@@ -1569,6 +1588,12 @@ a.masthead--part {
   .spread {
     grid-template-columns: 1fr;
     gap: var(--g-4);
+  }
+
+  /* One column: nothing to align the ledger against, and the optical nudges are
+     measured against a marginal column that is no longer there. */
+  .contents > .year:first-of-type {
+    margin-top: 0;
   }
 
   .index {

@@ -227,7 +227,10 @@ from hugo-paper renders; `layouts/_default/baseof.html` is the shell.
   left (techniques counted, then the year spine, then the author plate), sticky from 1000px up;
   the **contents ledger** on the right, grouped by a **year spine** (`6.2rem` folio column +
   titles). Every row is the same: date column plus one title, whether or not the record is
-  paired.
+  paired. The first line of each column reads level as **ink**, not merely as boxes: the first year
+  group carries `--year-align`, a measured optical nudge (−4.5px in English, +6.9px in Chinese,
+  where the index names hang lower in the CJK head), switched off below 1000px. It is a measurement
+  of two different type scales, not a spacing step — re-measure it if either scale changes.
 - **Record pages** set one text block, `max-width: 610px`, centred between the sheet margins — the
   same width in both editions, because a Translation pair should read as one page in two languages.
   The edition switch and the earlier/later pair print inside the same measure.
