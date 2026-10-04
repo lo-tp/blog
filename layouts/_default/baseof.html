@@ -19,16 +19,14 @@
   <body>
     <script>
       // Apply the reader's stored edition before anything paints, so a night
-      // reader never sees a flash of paper first.
+      // reader never sees a flash of paper first. The default edition is light:
+      // only the reader's own dial turn paints night, never the system's.
       (function () {
         var stored = null;
         try {
           stored = localStorage.getItem("dark");
         } catch (e) {}
-        var prefersDark =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (stored !== null ? stored === "true" : prefersDark) {
+        if (stored === "true") {
           document.documentElement.classList.add("dark");
         }
       })();

@@ -137,7 +137,8 @@ stops working, with nothing in the build log to tell you. The same script measur
 publishes the result as `--band-h`, which is what the sticky index rail and the `#y####` anchors
 offset from — the band's height is its own content, so nothing hardcodes it. (`baseof.html` also runs a script
 before paint, which applies the stored edition so a night reader never sees a flash of paper
-first. Both are worth re-reading after any edit to the header.)
+first. The default edition is light: neither script reads `prefers-color-scheme`, so night is
+always the reader's own choice. Both are worth re-reading after any edit to the header.)
 
 ## Header spacing
 

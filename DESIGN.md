@@ -283,6 +283,9 @@ dark-mode control, drawn glyphs from one icon set for the profile links on the t
 - **Rule:** renders only where a translation twin exists. An Untranslated post shows no switch and no apology.
 
 ### Dark-mode dial
+- **Default:** the light edition. A page goes night only when the reader has turned the dial and
+  comes back; the system colour preference is never read, so a reader in a dark-mode OS still
+  gets paper until they ask for slate.
 - **Style:** a 22px drawn control, not an emoji or a stock glyph. Day prints the left half inked; night prints it as a crescent. One step, no cross-fade.
 - **Hover:** the reserved ink.
 
