@@ -74,7 +74,9 @@
 - id: chrome_colophon_type
   translation: 'Set in Archivo Narrow'
 
+# The ledger's year counts. The word is Blog, the same word the header band
+# wears beside the edition's name: the chrome never calls a post a record.
 - id: chrome_records_unit
   translation:
-    one: ' record'
-    other: ' records'
+    one: ' blog'
+    other: ' blogs'
