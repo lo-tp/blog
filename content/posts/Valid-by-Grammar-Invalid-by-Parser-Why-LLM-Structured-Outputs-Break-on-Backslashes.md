@@ -4,6 +4,7 @@ description: "I lost a whole batch of generated work to one character, and the f
 date: 2026-10-15T00:00:00
 draft: false
 tags: ["LLM"]
+translationKey: Valid-by-Grammar-Invalid-by-Parser-Why-LLM-Structured-Outputs-Break-on-Backslashes
 ---
 
 **TLDR:** If you ask an LLM for structured JSON and you have met `502 structured_output_failed`, the culprit is
