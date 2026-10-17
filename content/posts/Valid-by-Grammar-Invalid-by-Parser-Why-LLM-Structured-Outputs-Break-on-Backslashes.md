@@ -1,6 +1,6 @@
 ---
 title: "Valid by Grammar, Invalid by Parser: Why LLM Structured Outputs Break on Backslashes"
-description: "A 502 from a JSON-constrained LLM call taught me that a grammar and a parser can disagree, and that the same bug has a silent twin. How I isolated it, and what the fix actually was."
+description: "I lost a whole batch of generated work to one character, and the fix was not a better prompt: strict mode off, and the schema and type checking done by hand. The quieter half of this bug is worse than the 502 — nothing fails, and a macro is stored as a form feed."
 date: 2026-10-15T00:00:00
 draft: false
 tags: ["LLM"]
